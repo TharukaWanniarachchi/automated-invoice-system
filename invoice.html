@@ -747,49 +747,89 @@
       }, 100);
     }
     
-    // Download PDF function – fixed to avoid alert and handle local-file logo
+    // Download PDF function – optimized for mobile devices
     function downloadPDF() {
       const inputPanel = document.querySelector('.input-panel');
       const invoiceElement = document.querySelector('.page');
       const logo = document.querySelector('.brand-logo');
       const originalLogoSrc = logo ? logo.getAttribute('src') : null;
+      const isMobile = window.innerWidth <= 768;
 
       // If running from file://, hide logo to avoid html2canvas security error
       if (window.location.protocol === 'file:' && logo) {
         logo.removeAttribute('src');
       }
 
-      // Hide input panel temporarily
+      // Hide input panel and prepare for PDF generation
       inputPanel.style.display = 'none';
+      
+      // Mobile-specific adjustments for PDF
+      if (isMobile) {
+        // Temporarily adjust styles for better PDF on mobile
+        document.body.style.width = '900px';
+        document.body.style.transform = 'scale(1)';
+        document.body.style.transformOrigin = 'top left';
+        invoiceElement.style.width = '800px';
+        invoiceElement.style.maxWidth = '800px';
+        invoiceElement.style.margin = '0 auto';
+        invoiceElement.style.padding = '30px 40px';
+        
+        // Fix table for PDF
+        const table = invoiceElement.querySelector('table');
+        if (table) {
+          table.style.fontSize = '12px';
+          table.style.width = '100%';
+        }
+        
+        // Fix header for mobile PDF
+        const header = invoiceElement.querySelector('.header');
+        if (header) {
+          header.style.flexDirection = 'row';
+          header.style.justifyContent = 'space-between';
+        }
+        
+        // Fix brand block
+        const brandBlock = invoiceElement.querySelector('.brand-block');
+        if (brandBlock) {
+          brandBlock.style.flexDirection = 'row';
+          brandBlock.style.alignItems = 'center';
+          brandBlock.style.maxWidth = '60%';
+        }
+      }
       
       setTimeout(() => {
         if (typeof html2pdf === 'undefined') {
           // Restore logo if we removed it
           if (logo && originalLogoSrc) logo.setAttribute('src', originalLogoSrc);
-          inputPanel.style.display = 'block';
+          restoreOriginalStyles();
           customPrint();
           return;
         }
         
         try {
           const opt = {
-            margin: [10, 10, 10, 10],
+            margin: isMobile ? [5, 5, 5, 5] : [10, 10, 10, 10],
             filename: `Sunset_Escape_Invoice_${invoiceData.invoiceNumber || new Date().getTime()}.pdf`,
             image: { 
               type: 'jpeg', 
-              quality: 0.95 
+              quality: 0.98
             },
             html2canvas: { 
-              scale: 1.5,
+              scale: isMobile ? 2 : 1.5,
               useCORS: false,
               allowTaint: true,
               backgroundColor: '#ffffff',
-              logging: false
+              logging: false,
+              width: isMobile ? 800 : null,
+              height: isMobile ? null : null,
+              windowWidth: isMobile ? 800 : 1200,
+              windowHeight: isMobile ? 1000 : 800
             },
             jsPDF: { 
               unit: 'mm', 
               format: 'a4', 
-              orientation: 'portrait'
+              orientation: 'portrait',
+              compress: true
             }
           };
           
@@ -799,28 +839,62 @@
             worker
               .then(() => {
                 if (logo && originalLogoSrc) logo.setAttribute('src', originalLogoSrc);
-                inputPanel.style.display = 'block';
+                restoreOriginalStyles();
               })
               .catch((error) => {
                 console.error('PDF generation error:', error);
                 if (logo && originalLogoSrc) logo.setAttribute('src', originalLogoSrc);
-                inputPanel.style.display = 'block';
+                restoreOriginalStyles();
                 // Silent fallback to browser print
                 customPrint();
               });
           } else {
             // No thenable; just restore and do nothing
             if (logo && originalLogoSrc) logo.setAttribute('src', originalLogoSrc);
-            inputPanel.style.display = 'block';
+            restoreOriginalStyles();
           }
             
         } catch (error) {
           console.error('PDF library error:', error);
           if (logo && originalLogoSrc) logo.setAttribute('src', originalLogoSrc);
-          inputPanel.style.display = 'block';
+          restoreOriginalStyles();
           customPrint();
         }
       }, 300);
+      
+      // Function to restore original styles
+      function restoreOriginalStyles() {
+        inputPanel.style.display = 'block';
+        document.body.style.width = '';
+        document.body.style.transform = '';
+        document.body.style.transformOrigin = '';
+        invoiceElement.style.width = '';
+        invoiceElement.style.maxWidth = '';
+        invoiceElement.style.margin = '';
+        invoiceElement.style.padding = '';
+        
+        // Restore table
+        const table = invoiceElement.querySelector('table');
+        if (table) {
+          table.style.fontSize = '';
+          table.style.width = '';
+        }
+        
+        // Restore header
+        const header = invoiceElement.querySelector('.header');
+        if (header) {
+          header.style.flexDirection = '';
+          header.style.justifyContent = '';
+        }
+        
+        // Restore brand block
+        const brandBlock = invoiceElement.querySelector('.brand-block');
+        if (brandBlock) {
+          brandBlock.style.flexDirection = '';
+          brandBlock.style.alignItems = '';
+          brandBlock.style.maxWidth = '';
+        }
+      }
     }
 
     // Initialize when page loads
