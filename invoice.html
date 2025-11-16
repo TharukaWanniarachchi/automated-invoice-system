@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Automated Invoice Generator - Sunset Escape</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: #f4f4f4;
+      padding: 20px;
+      color: #000000;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      gap: 30px;
+    }
+
+    /* INPUT PANEL */
+    .input-panel {
+      width: 400px;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+      height: fit-content;
+      position: sticky;
+      top: 20px;
+    }
+
+    .input-panel h2 {
+      color: #E1C571;
+      margin-bottom: 20px;
+      font-size: 24px;
+      border-bottom: 2px solid #E1C571;
+      padding-bottom: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .form-group input:focus, .form-group textarea:focus {
+      border-color: #E1C571;
+      outline: none;
+    }
+
+    .items-section {
+      border: 2px solid #E1C571;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .items-section h3 {
+      color: #E1C571;
+      margin-bottom: 15px;
+    }
+
+    .item-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      align-items: end;
+    }
+
+    .item-row input {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    .item-row .desc-input {
+      flex: 2;
+    }
+
+    .item-row .qty-input, .item-row .price-input {
+      flex: 1;
+      max-width: 80px;
+    }
+
+    .item-row button {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .add-item-btn {
+      background: #E1C571;
+      color: black;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      width: 100%;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .btn-primary {
+      background: #E1C571;
+      color: black;
+    }
+
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+
+    /* INVOICE PREVIEW */
+    .invoice-preview {
+      flex: 1;
+    }
+
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 40px 50px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    }
+
+    /* HEADER */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 30px;
+      border-bottom: 3px solid #E1C571;
+      padding-bottom: 15px;
+    }
+
+    .brand-block {
+      max-width: 60%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 80px;
+      height: auto;
+    }
+
+    .brand-name {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    .brand-tagline {
+      font-size: 13px;
+      letter-spacing: 0.5px;
+      color: #333333;
+      margin-bottom: 8px;
+    }
+
+    .brand-contact {
+      font-size: 13px;
+      color: #333333;
+      line-height: 1.4;
+    }
+
+    .brand-contact span {
+      display: block;
+    }
+
+    .invoice-block {
+      text-align: right;
+      font-size: 13px;
+      color: #000000;
+    }
+
+    .invoice-title {
+      font-size: 26px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .meta-table {
+      margin-left: auto;
+      border-collapse: collapse;
+    }
+
+    .meta-table td {
+      padding: 2px 0 2px 10px;
+      font-size: 13px;
+    }
+
+    .meta-label {
+      font-weight: 600;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    /* TABLE */
+    .table-wrapper {
+      margin-top: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead tr {
+      background: #E1C571;
+      color: #000000;
+    }
+
+    thead th {
+      text-transform: uppercase;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 10px 8px;
+      text-align: left;
+      border-bottom: 1px solid #dddddd;
+    }
+
+    tbody td {
+      padding: 10px 8px;
+      border-bottom: 1px solid #eeeeee;
+      vertical-align: top;
+    }
+
+    .col-desc {
+      width: 50%;
+    }
+
+    .col-qty {
+      width: 15%;
+    }
+
+    .col-unit {
+      width: 15%;
+    }
+
+    .col-total {
+      width: 20%;
+    }
+
+    .amount {
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    /* SUMMARY */
+    .summary-block {
+      max-width: 280px;
+      margin-left: auto;
+      margin-top: 18px;
+      border-top: 2px solid #000000;
+      padding-top: 8px;
+      font-size: 14px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+    }
+
+    .summary-label {
+      font-weight: 500;
+    }
+
+    .summary-total {
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 2px solid #E1C571;
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    /* FOOTER */
+    .footer {
+      margin-top: 35px;
+      font-size: 12px;
+      color: #333333;
+      border-top: 1px solid #dddddd;
+      padding-top: 10px;
+      text-align: right;
+    }
+
+    .footer strong {
+      color: #000000;
+    }
+
+    /* PRINT */
+    @media print {
+      @page {
+        size: 900px 1200px;
+        margin: 0;
+      }
+      
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      
+      html {
+        width: 900px !important;
+        height: auto !important;
+      }
+      
+      body {
+        background: #ffffff !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 900px !important;
+      }
+      
+      .page {
+        width: 900px !important;
+        height: auto !important;
+        margin: 0 auto !important;
+        padding: 40px 50px !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        page-break-inside: avoid !important;
+      }
+      
+      .header {
+        border-bottom: 3px solid #E1C571 !important;
+        width: 100% !important;
+        margin-bottom: 30px !important;
+        padding-bottom: 15px !important;
+      }
+      
+      .brand-logo {
+        width: 80px !important;
+        height: auto !important;
+      }
+      
+      table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        font-size: 14px !important;
+      }
+      
+      thead tr {
+        background: #E1C571 !important;
+        color: #000000 !important;
+      }
+      
+      thead th {
+        background: #E1C571 !important;
+        color: #000000 !important;
+        padding: 10px 8px !important;
+      }
+      
+      tbody td {
+        padding: 10px 8px !important;
+        border-bottom: 1px solid #eeeeee !important;
+      }
+      
+      .summary-block {
+        max-width: 280px !important;
+        margin-left: auto !important;
+        margin-top: 18px !important;
+        border-top: 2px solid #000000 !important;
+        padding-top: 8px !important;
+      }
+      
+      .summary-total {
+        border-top: 2px solid #E1C571 !important;
+        margin-top: 6px !important;
+        padding-top: 6px !important;
+      }
+      
+      .footer {
+        margin-top: 35px !important;
+        border-top: 1px solid #dddddd !important;
+        padding-top: 10px !important;
+      }
+      
+      .invoice-preview {
+        width: 900px !important;
+        margin: 0 auto !important;
+      }
+      
+      .container {
+        display: block !important;
+        width: 900px !important;
+        margin: 0 auto !important;
+      }
+      
+      body, html {
+        overflow: visible !important;
+      }
+      
+      body * {
+        overflow: visible !important;
+        transform: none !important;
+      }
+      
+      .page * {
+        overflow: visible !important;
+        transform: none !important;
+      }
+      
+      .page, .page * {
+        box-shadow: none !important;
+        border-radius: 0 !important;
+      }
+      
+      body {
+        position: static !important;
+      }
+      
+      * {
+        position: static !important;
+      }
+      
+      html, body {
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: visible !important;
+        transform: scale(1) !important;
+        zoom: 1 !important;
+      }
+      
+      .input-panel {
+        display: none !important;
+        visibility: hidden !important;
+      }
+      
+      .container {
+        display: block !important;
+        width: 900px !important;
+        margin: 0 auto !important;
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .container {
+        flex-direction: column;
+      }
+      .input-panel {
+        width: 100%;
+        position: relative;
+        top: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- INPUT PANEL -->
+    <div class="input-panel">
+      <h2>Invoice Generator</h2>
+      
+      <!-- Invoice Details -->
+      <div class="form-group">
+        <label for="invoiceNumber">Invoice Number</label>
+        <input type="text" id="invoiceNumber" value="000144" onchange="updateInvoice()">
+      </div>
+      
+      <div class="form-group">
+        <label for="invoiceDate">Invoice Date</label>
+        <input type="date" id="invoiceDate" value="2025-11-09" onchange="updateInvoice()">
+      </div>
+
+      <!-- Items Section -->
+      <div class="items-section">
+        <h3>Booking Items</h3>
+        <div id="itemsContainer">
+          <!-- Items will be populated here -->
+        </div>
+        <button class="add-item-btn" onclick="addNewItem()">+ Add Item</button>
+      </div>
+
+      <!-- Advanced Payment -->
+      <div class="form-group">
+        <label for="advancedPayment">Advanced Payment (LKR)</label>
+        <input type="number" id="advancedPayment" value="42000" onchange="updateInvoice()">
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button class="btn btn-primary" onclick="customPrint()">Print Invoice</button>
+        <button class="btn btn-secondary" onclick="downloadPDF()">Save PDF</button>
+      </div>
+    </div>
+
+    <!-- INVOICE PREVIEW -->
+    <div class="invoice-preview">
+      <div class="page">
+        <!-- HEADER -->
+        <div class="header">
+          <div class="brand-block">
+            <img src="logo.png" alt="Sunset Escape Logo" class="brand-logo" />
+            <div>
+              <div class="brand-name">Sunset Escape</div>
+              <div class="brand-tagline">Beyond the ordinary, into luxury</div>
+              <div class="brand-contact">
+                <span>+94 71 417 5072</span>
+                <span>Sunset Escape Homagama</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="invoice-block">
+            <div class="invoice-title">Invoice</div>
+            <table class="meta-table">
+              <tr>
+                <td class="meta-label">Invoice #</td>
+                <td id="displayInvoiceNumber">000144</td>
+              </tr>
+              <tr>
+                <td class="meta-label">Date</td>
+                <td id="displayInvoiceDate">09 / 11 / 2025</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- BOOKING TABLE -->
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th class="col-desc">Booking Details</th>
+                <th class="col-qty">Quantity</th>
+                <th class="col-unit">Unit Price</th>
+                <th class="col-total">Total</th>
+              </tr>
+            </thead>
+            <tbody id="invoiceItemsTable">
+              <!-- Items will be populated here -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- SUMMARY -->
+        <div class="summary-block">
+          <div class="summary-row">
+            <span class="summary-label">Sub Total</span>
+            <span id="subTotal">68,500</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Advanced</span>
+            <span id="advancedAmount">42,000</span>
+          </div>
+          <div class="summary-row summary-total">
+            <span>Total</span>
+            <span id="totalAmount">26,500</span>
+          </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+          <strong>Thank you for choosing Sunset Escape.</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- html2pdf.js library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <script>
+    // Invoice data structure
+    let invoiceData = {
+      invoiceNumber: '000144',
+      date: '2025-11-09',
+      items: [
+        { description: '09 November 2025 Day Out Booking', quantity: 1, unitPrice: 50000 },
+        { description: 'Additional 7 pax', quantity: 7, unitPrice: 2500 },
+        { description: 'Kitchen Charges', quantity: 1, unitPrice: 1000 }
+      ],
+      advancedPayment: 42000
+    };
+
+    // Initialize the form
+    function initializeForm() {
+      document.getElementById('invoiceNumber').value = invoiceData.invoiceNumber;
+      document.getElementById('invoiceDate').value = invoiceData.date;
+      document.getElementById('advancedPayment').value = invoiceData.advancedPayment;
+      
+      renderItems();
+      updateInvoice();
+    }
+
+    // Render items in the input panel
+    function renderItems() {
+      const container = document.getElementById('itemsContainer');
+      container.innerHTML = '';
+      
+      invoiceData.items.forEach((item, index) => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'item-row';
+        itemDiv.innerHTML = `
+          <input type="text" class="desc-input" placeholder="Description" value="${item.description}" 
+                 onchange="updateItem(${index}, 'description', this.value)">
+          <input type="number" class="qty-input" placeholder="Qty" value="${item.quantity}" min="1"
+                 onchange="updateItem(${index}, 'quantity', parseFloat(this.value))">
+          <input type="number" class="price-input" placeholder="Price" value="${item.unitPrice}" min="0"
+                 onchange="updateItem(${index}, 'unitPrice', parseFloat(this.value))">
+          <button onclick="removeItem(${index})">×</button>
+        `;
+        container.appendChild(itemDiv);
+      });
+    }
+
+    // Update individual item
+    function updateItem(index, field, value) {
+      invoiceData.items[index][field] = value;
+      updateInvoice();
+    }
+
+    // Add new item
+    function addNewItem() {
+      invoiceData.items.push({ description: '', quantity: 1, unitPrice: 0 });
+      renderItems();
+      updateInvoice();
+    }
+
+    // Remove item
+    function removeItem(index) {
+      invoiceData.items.splice(index, 1);
+      renderItems();
+      updateInvoice();
+    }
+
+    // Format currency
+    function formatCurrency(amount) {
+      return amount.toLocaleString();
+    }
+
+    // Format date for display
+    function formatDate(dateString) {
+      const date =
+        new Date(dateString);
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day} / ${month} / ${year}`;
+    }
+
+    // Update invoice preview
+    function updateInvoice() {
+      // Update basic info
+      invoiceData.invoiceNumber = document.getElementById('invoiceNumber').value;
+      invoiceData.date = document.getElementById('invoiceDate').value;
+      invoiceData.advancedPayment = parseFloat(document.getElementById('advancedPayment').value) || 0;
+
+      // Update display
+      document.getElementById('displayInvoiceNumber').textContent = invoiceData.invoiceNumber;
+      document.getElementById('displayInvoiceDate').textContent = formatDate(invoiceData.date);
+
+      // Update items table
+      const tableBody = document.getElementById('invoiceItemsTable');
+      tableBody.innerHTML = '';
+      
+      let subTotal = 0;
+      
+      invoiceData.items.forEach(item => {
+        const total = item.quantity * item.unitPrice;
+        subTotal += total;
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td class="col-desc">${item.description}</td>
+          <td class="col-qty">${item.quantity}</td>
+          <td class="col-unit amount">${formatCurrency(item.unitPrice)}</td>
+          <td class="col-total amount">${formatCurrency(total)}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+
+      // Update summary
+      const totalAmount = subTotal - invoiceData.advancedPayment;
+      document.getElementById('subTotal').textContent = formatCurrency(subTotal);
+      document.getElementById('advancedAmount').textContent = formatCurrency(invoiceData.advancedPayment);
+      document.getElementById('totalAmount').textContent = formatCurrency(totalAmount);
+    }
+
+    // Custom print function (kept same)
+    function customPrint() {
+      const inputPanel = document.querySelector('.input-panel');
+      inputPanel.style.display = 'none';
+      
+      document.body.style.width = '900px';
+      document.body.style.maxWidth = '900px';
+      document.body.style.minWidth = '900px';
+      
+      window.print();
+      
+      setTimeout(() => {
+        inputPanel.style.display = 'block';
+        document.body.style.width = '';
+        document.body.style.maxWidth = '';
+        document.body.style.minWidth = '';
+      }, 100);
+    }
+    
+    // Download PDF function – fixed to avoid alert and handle local-file logo
+    function downloadPDF() {
+      const inputPanel = document.querySelector('.input-panel');
+      const invoiceElement = document.querySelector('.page');
+      const logo = document.querySelector('.brand-logo');
+      const originalLogoSrc = logo ? logo.getAttribute('src') : null;
+
+      // If running from file://, hide logo to avoid html2canvas security error
+      if (window.location.protocol === 'file:' && logo) {
+        logo.removeAttribute('src');
+      }
+
+      // Hide input panel temporarily
+      inputPanel.style.display = 'none';
+      
+      setTimeout(() => {
+        if (typeof html2pdf === 'undefined') {
+          // Restore logo if we removed it
+          if (logo && originalLogoSrc) logo.setAttribute('src', originalLogoSrc);
+          inputPanel.style.display = 'block';
+          customPrint();
+          return;
+        }
+        
+        try {
+          const opt = {
+            margin: [10, 10, 10, 10],
+            filename: `Sunset_Escape_Invoice_${invoiceData.invoiceNumber || new Date().getTime()}.pdf`,
+            image: { 
+              type: 'jpeg', 
+              quality: 0.95 
+            },
+            html2canvas: { 
+              scale: 1.5,
+              useCORS: false,
+              allowTaint: true,
+              backgroundColor: '#ffffff',
+              logging: false
+            },
+            jsPDF: { 
+              unit: 'mm', 
+              format: 'a4', 
+              orientation: 'portrait'
+            }
+          };
+          
+          const worker = html2pdf().set(opt).from(invoiceElement).save();
+          
+          if (worker && typeof worker.then === 'function') {
+            worker
+              .then(() => {
+                if (logo && originalLogoSrc) logo.setAttribute('src', originalLogoSrc);
+                inputPanel.style.display = 'block';
+              })
+              .catch((error) => {
+                console.error('PDF generation error:', error);
+                if (logo && originalLogoSrc) logo.setAttribute('src', originalLogoSrc);
+                inputPanel.style.display = 'block';
+                // Silent fallback to browser print
+                customPrint();
+              });
+          } else {
+            // No thenable; just restore and do nothing
+            if (logo && originalLogoSrc) logo.setAttribute('src', originalLogoSrc);
+            inputPanel.style.display = 'block';
+          }
+            
+        } catch (error) {
+          console.error('PDF library error:', error);
+          if (logo && originalLogoSrc) logo.setAttribute('src', originalLogoSrc);
+          inputPanel.style.display = 'block';
+          customPrint();
+        }
+      }, 300);
+    }
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', initializeForm);
+  </script>
+</body>
+</html>
