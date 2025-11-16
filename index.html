@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="format-detection" content="telephone=no">
   <title>Automated Invoice Generator - Sunset Escape</title>
   <style>
     * {
@@ -35,6 +39,7 @@
       height: fit-content;
       position: sticky;
       top: 20px;
+      min-width: 320px;
     }
 
     .input-panel h2 {
@@ -58,15 +63,20 @@
 
     .form-group input, .form-group textarea {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       border: 2px solid #ddd;
-      border-radius: 4px;
-      font-size: 14px;
+      border-radius: 6px;
+      font-size: 16px;
+      -webkit-appearance: none;
+      appearance: none;
+      min-height: 44px;
+      box-sizing: border-box;
     }
 
     .form-group input:focus, .form-group textarea:focus {
       border-color: #E1C571;
       outline: none;
+      box-shadow: 0 0 0 3px rgba(225, 197, 113, 0.2);
     }
 
     .items-section {
@@ -90,54 +100,74 @@
 
     .item-row input {
       flex: 1;
-      padding: 8px;
+      padding: 10px;
       border: 1px solid #ddd;
-      border-radius: 4px;
-      font-size: 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      min-height: 40px;
+      -webkit-appearance: none;
+      appearance: none;
+      box-sizing: border-box;
     }
 
     .item-row .desc-input {
       flex: 2;
+      min-width: 120px;
     }
 
     .item-row .qty-input, .item-row .price-input {
       flex: 1;
-      max-width: 80px;
+      max-width: 90px;
+      min-width: 60px;
     }
 
     .item-row button {
       background: #dc3545;
       color: white;
       border: none;
-      padding: 8px 12px;
-      border-radius: 4px;
+      padding: 10px 14px;
+      border-radius: 6px;
       cursor: pointer;
+      min-height: 40px;
+      min-width: 40px;
+      font-size: 16px;
+      font-weight: bold;
     }
 
     .add-item-btn {
       background: #E1C571;
       color: black;
       border: none;
-      padding: 10px 20px;
-      border-radius: 4px;
+      padding: 14px 20px;
+      border-radius: 6px;
       cursor: pointer;
       font-weight: 600;
       width: 100%;
+      font-size: 16px;
+      min-height: 48px;
+      transition: background-color 0.2s ease;
+    }
+
+    .add-item-btn:hover, .add-item-btn:active {
+      background: #d4b560;
     }
 
     .action-buttons {
       display: flex;
-      gap: 10px;
+      gap: 12px;
+      flex-direction: column;
     }
 
     .btn {
       flex: 1;
-      padding: 12px;
+      padding: 14px;
       border: none;
-      border-radius: 4px;
+      border-radius: 6px;
       cursor: pointer;
       font-weight: 600;
-      font-size: 14px;
+      font-size: 16px;
+      min-height: 48px;
+      transition: all 0.2s ease;
     }
 
     .btn-primary {
@@ -479,15 +509,262 @@
       }
     }
 
-    /* Responsive */
+    /* Responsive Design */
+    
+    /* Large tablets and small laptops */
     @media (max-width: 1200px) {
       .container {
         flex-direction: column;
+        gap: 20px;
       }
       .input-panel {
         width: 100%;
         position: relative;
         top: 0;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+    }
+
+    /* Tablets (iPad) */
+    @media (max-width: 768px) {
+      body {
+        padding: 15px;
+      }
+      
+      .container {
+        gap: 15px;
+      }
+      
+      .input-panel {
+        padding: 20px;
+        border-radius: 6px;
+      }
+      
+      .input-panel h2 {
+        font-size: 22px;
+        margin-bottom: 15px;
+      }
+      
+      .page {
+        padding: 30px 25px;
+        border-radius: 6px;
+      }
+      
+      .header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+      }
+      
+      .brand-block {
+        max-width: 100%;
+      }
+      
+      .invoice-block {
+        text-align: left;
+      }
+      
+      .meta-table {
+        margin-left: 0;
+      }
+      
+      .brand-logo {
+        width: 60px;
+      }
+      
+      .brand-name {
+        font-size: 24px;
+      }
+      
+      table {
+        font-size: 13px;
+      }
+      
+      thead th {
+        padding: 8px 6px;
+        font-size: 11px;
+      }
+      
+      tbody td {
+        padding: 8px 6px;
+      }
+      
+      .action-buttons {
+        flex-direction: row;
+        gap: 10px;
+      }
+    }
+
+    /* Mobile phones (iPhone) */
+    @media (max-width: 480px) {
+      body {
+        padding: 10px;
+      }
+      
+      .input-panel {
+        padding: 15px;
+      }
+      
+      .form-group {
+        margin-bottom: 15px;
+      }
+      
+      .items-section {
+        padding: 15px;
+      }
+      
+      .item-row {
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 15px;
+        border: 1px solid #E1C571;
+        padding: 10px;
+        border-radius: 6px;
+      }
+      
+      .item-row input {
+        max-width: none;
+        width: 100%;
+        margin: 0;
+      }
+      
+      .item-row button {
+        width: 100%;
+        margin-top: 5px;
+      }
+      
+      .page {
+        padding: 20px 15px;
+      }
+      
+      .header {
+        gap: 10px;
+      }
+      
+      .brand-block {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+      }
+      
+      .brand-logo {
+        width: 50px;
+      }
+      
+      .brand-name {
+        font-size: 20px;
+      }
+      
+      .brand-tagline {
+        font-size: 12px;
+      }
+      
+      .brand-contact {
+        font-size: 12px;
+      }
+      
+      .invoice-title {
+        font-size: 22px;
+      }
+      
+      table {
+        font-size: 12px;
+      }
+      
+      thead th {
+        padding: 6px 4px;
+        font-size: 10px;
+      }
+      
+      tbody td {
+        padding: 6px 4px;
+      }
+      
+      .col-desc {
+        width: 45%;
+      }
+      
+      .col-qty {
+        width: 18%;
+      }
+      
+      .col-unit {
+        width: 18%;
+      }
+      
+      .col-total {
+        width: 19%;
+      }
+      
+      .summary-block {
+        max-width: 100%;
+        font-size: 13px;
+      }
+      
+      .action-buttons {
+        flex-direction: column;
+        gap: 8px;
+      }
+    }
+
+    /* Very small screens */
+    @media (max-width: 360px) {
+      .page {
+        padding: 15px 10px;
+      }
+      
+      .brand-name {
+        font-size: 18px;
+      }
+      
+      .invoice-title {
+        font-size: 20px;
+      }
+      
+      table {
+        font-size: 11px;
+      }
+      
+      thead th {
+        padding: 5px 3px;
+        font-size: 9px;
+      }
+      
+      tbody td {
+        padding: 5px 3px;
+      }
+    }
+
+    /* Touch device optimizations */
+    @media (hover: none) and (pointer: coarse) {
+      .btn:active, .add-item-btn:active, .item-row button:active {
+        transform: scale(0.95);
+      }
+      
+      input:focus {
+        transform: none;
+      }
+      
+      /* Prevent zoom on input focus for iOS */
+      input, select, textarea {
+        font-size: 16px !important;
+      }
+    }
+
+    /* iOS Safari specific fixes */
+    @supports (-webkit-appearance: none) {
+      input[type="date"]::-webkit-calendar-picker-indicator {
+        background: transparent;
+        bottom: 0;
+        color: transparent;
+        cursor: pointer;
+        height: auto;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: auto;
       }
     }
   </style>
