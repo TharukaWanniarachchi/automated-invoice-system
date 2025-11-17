@@ -510,8 +510,6 @@
     }
 
     /* Responsive Design */
-    
-    /* Large tablets and small laptops */
     @media (max-width: 1200px) {
       .container {
         flex-direction: column;
@@ -526,7 +524,6 @@
       }
     }
 
-    /* Tablets (iPad) */
     @media (max-width: 768px) {
       body {
         padding: 15px;
@@ -596,7 +593,6 @@
       }
     }
 
-    /* Mobile phones (iPhone) */
     @media (max-width: 480px) {
       body {
         padding: 10px;
@@ -913,143 +909,55 @@
       }, 100);
     }
     
-    // Updated Download PDF function - Fixed blank issue + higher quality + tight invoice size
+    // Simplified, stable Download PDF function
     function downloadPDF() {
+      const inputPanel = document.querySelector('.input-panel');
+      const invoiceElement = document.querySelector('.page');
+
       if (typeof html2pdf === 'undefined') {
-        console.warn('html2pdf.js not loaded. Falling back to print.');
         customPrint();
         return;
       }
 
-      const inputPanel = document.querySelector('.input-panel');
-      const invoiceElement = document.querySelector('.page');
-      const logo = document.querySelector('.brand-logo');
-      const originalLogoSrc = logo ? logo.getAttribute('src') : null;
-      const isMobile = window.innerWidth <= 768;
+      const originalBodyPadding = document.body.style.padding;
 
-      // Temporarily hide input panel
+      // Hide side panel and remove body padding so only invoice is captured
       inputPanel.style.display = 'none';
-
-      // Apply PDF-optimized styles with reduced padding for tight fit
       document.body.style.padding = '0';
-      invoiceElement.style.padding = isMobile ? '20px 30px' : '20px 30px'; // Reduced padding for tighter fit
-      invoiceElement.style.margin = '0 auto';
-      invoiceElement.style.width = '100%';
-      invoiceElement.style.maxWidth = '800px';
-      
-      const table = invoiceElement.querySelector('table');
-      if (table) {
-        table.style.fontSize = '13px'; // Slightly smaller for fit
-        table.style.width = '100%';
-      }
-      
-      const header = invoiceElement.querySelector('.header');
-      if (header) {
-        header.style.flexDirection = 'row';
-        header.style.justifyContent = 'space-between';
-        header.style.marginBottom = '20px'; // Reduced margin
-      }
-      
-      const brandBlock = invoiceElement.querySelector('.brand-block');
-      if (brandBlock) {
-        brandBlock.style.flexDirection = 'row';
-        brandBlock.style.alignItems = 'center';
-        brandBlock.style.maxWidth = '60%';
-      }
 
-      // Wait for re-render with requestAnimationFrame + longer timeout
-      requestAnimationFrame(() => {
-        setTimeout(() => {
-          try {
-            // Enhanced options for quality, reliability, and tight content fit
-            const opt = {
-              margin: [0, 0, 0, 0], // Zero margins for invoice-only size (no extra white space)
-              filename: `Sunset_Escape_Invoice_${invoiceData.invoiceNumber || new Date().getTime()}.pdf`,
-              image: { 
-                type: 'png',  // PNG for sharper quality
-                quality: 1.0  // Max quality
-              },
-              html2canvas: { 
-                scale: isMobile ? 2.5 : 2,  // Higher scale for better resolution
-                useCORS: true,
-                allowTaint: true,
-                letterRendering: true,
-                foreignObjectRendering: true,
-                backgroundColor: '#ffffff',
-                logging: false,
-                width: 800,  // Fixed width for consistent invoice size
-                height: null, // Auto height based on content
-                windowWidth: 800,
-                windowHeight: 600,
-                ignoreElements: (el) => el.id === 'itemsContainer' || el.classList.contains('input-panel')
-              },
-              jsPDF: { 
-                unit: 'mm', 
-                format: 'a4',  // Keep A4 but with zero margins it fits content tightly
-                orientation: 'portrait',
-                compress: false
-              },
-              pagebreak: { mode: ['avoid-all', 'css', 'legacy'] } // Avoid unnecessary page breaks
-            };
-
-            const worker = html2pdf().set(opt).from(invoiceElement).save();
-
-            if (worker && typeof worker.then === 'function') {
-              worker
-                .then(() => {
-                  restoreOriginalStyles();
-                  if (logo && originalLogoSrc) logo.setAttribute('src', originalLogoSrc);
-                  console.log('PDF generated successfully.');
-                })
-                .catch((error) => {
-                  console.error('PDF generation error:', error);
-                  restoreOriginalStyles();
-                  if (logo && originalLogoSrc) logo.setAttribute('src', originalLogoSrc);
-                  setTimeout(customPrint, 100);
-                });
-            } else {
-              restoreOriginalStyles();
-              if (logo && originalLogoSrc) logo.setAttribute('src', originalLogoSrc);
-            }
-            
-          } catch (error) {
-            console.error('PDF library error:', error);
-            restoreOriginalStyles();
-            if (logo && originalLogoSrc) logo.setAttribute('src', originalLogoSrc);
-            customPrint();
-          }
-        }, 500);  // Increased timeout
-      });
-
-      // Function to restore original styles
-      function restoreOriginalStyles() {
-        inputPanel.style.display = 'block';
-        document.body.style.padding = '';
-        invoiceElement.style.padding = '';
-        invoiceElement.style.margin = '';
-        invoiceElement.style.width = '';
-        invoiceElement.style.maxWidth = '';
-        
-        const table = invoiceElement.querySelector('table');
-        if (table) {
-          table.style.fontSize = '';
-          table.style.width = '';
+      const opt = {
+        margin: [10, 10, 10, 10],
+        filename: `Sunset_Escape_Invoice_${invoiceData.invoiceNumber || new Date().getTime()}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: '#ffffff',
+          logging: false
+        },
+        jsPDF: {
+          unit: 'mm',
+          format: 'a4',
+          orientation: 'portrait'
         }
-        
-        const header = invoiceElement.querySelector('.header');
-        if (header) {
-          header.style.flexDirection = '';
-          header.style.justifyContent = '';
-          header.style.marginBottom = '';
-        }
-        
-        const brandBlock = invoiceElement.querySelector('.brand-block');
-        if (brandBlock) {
-          brandBlock.style.flexDirection = '';
-          brandBlock.style.alignItems = '';
-          brandBlock.style.maxWidth = '';
-        }
-      }
+      };
+
+      html2pdf()
+        .set(opt)
+        .from(invoiceElement)
+        .save()
+        .then(() => {
+          // restore UI
+          inputPanel.style.display = 'block';
+          document.body.style.padding = originalBodyPadding;
+        })
+        .catch(err => {
+          console.error('PDF generation error:', err);
+          inputPanel.style.display = 'block';
+          document.body.style.padding = originalBodyPadding;
+          // fallback
+          customPrint();
+        });
     }
 
     // Initialize when page loads
