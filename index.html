@@ -698,7 +698,7 @@
       <!-- Action Buttons -->
       <div class="action-buttons">
         <button class="btn btn-primary" onclick="customPrint()">Print Invoice</button>
-        <button class="btn btn-secondary" onclick="downloadPDF()">Save PDF</button>
+        <button class="btn btn-secondary" onclick="downloadPDF()">Download PDF</button>
       </div>
     </div>
 
@@ -913,7 +913,7 @@
       }, 100);
     }
     
-    // Updated Download PDF function - Fixed blank issue + higher quality
+    // Updated Download PDF function - Fixed blank issue + higher quality + tight invoice size
     function downloadPDF() {
       if (typeof html2pdf === 'undefined') {
         console.warn('html2pdf.js not loaded. Falling back to print.');
@@ -930,68 +930,66 @@
       // Temporarily hide input panel
       inputPanel.style.display = 'none';
 
-      // Apply PDF-optimized styles (unchanged from your code, but with fixes)
-      if (isMobile) {
-        document.body.style.width = '900px';
-        document.body.style.transform = 'scale(1)';
-        document.body.style.transformOrigin = 'top left';
-        invoiceElement.style.width = '800px';
-        invoiceElement.style.maxWidth = '800px';
-        invoiceElement.style.margin = '0 auto';
-        invoiceElement.style.padding = '30px 40px';
-        
-        const table = invoiceElement.querySelector('table');
-        if (table) {
-          table.style.fontSize = '12px';
-          table.style.width = '100%';
-        }
-        
-        const header = invoiceElement.querySelector('.header');
-        if (header) {
-          header.style.flexDirection = 'row';
-          header.style.justifyContent = 'space-between';
-        }
-        
-        const brandBlock = invoiceElement.querySelector('.brand-block');
-        if (brandBlock) {
-          brandBlock.style.flexDirection = 'row';
-          brandBlock.style.alignItems = 'center';
-          brandBlock.style.maxWidth = '60%';
-        }
+      // Apply PDF-optimized styles with reduced padding for tight fit
+      document.body.style.padding = '0';
+      invoiceElement.style.padding = isMobile ? '20px 30px' : '20px 30px'; // Reduced padding for tighter fit
+      invoiceElement.style.margin = '0 auto';
+      invoiceElement.style.width = '100%';
+      invoiceElement.style.maxWidth = '800px';
+      
+      const table = invoiceElement.querySelector('table');
+      if (table) {
+        table.style.fontSize = '13px'; // Slightly smaller for fit
+        table.style.width = '100%';
+      }
+      
+      const header = invoiceElement.querySelector('.header');
+      if (header) {
+        header.style.flexDirection = 'row';
+        header.style.justifyContent = 'space-between';
+        header.style.marginBottom = '20px'; // Reduced margin
+      }
+      
+      const brandBlock = invoiceElement.querySelector('.brand-block');
+      if (brandBlock) {
+        brandBlock.style.flexDirection = 'row';
+        brandBlock.style.alignItems = 'center';
+        brandBlock.style.maxWidth = '60%';
       }
 
       // Wait for re-render with requestAnimationFrame + longer timeout
       requestAnimationFrame(() => {
         setTimeout(() => {
           try {
-            // Enhanced options for quality and reliability
+            // Enhanced options for quality, reliability, and tight content fit
             const opt = {
-              margin: isMobile ? [5, 5, 5, 5] : [10, 10, 10, 10],
+              margin: [0, 0, 0, 0], // Zero margins for invoice-only size (no extra white space)
               filename: `Sunset_Escape_Invoice_${invoiceData.invoiceNumber || new Date().getTime()}.pdf`,
               image: { 
-                type: 'png',  // Changed to PNG for sharper quality (no JPEG artifacts)
+                type: 'png',  // PNG for sharper quality
                 quality: 1.0  // Max quality
               },
               html2canvas: { 
                 scale: isMobile ? 2.5 : 2,  // Higher scale for better resolution
-                useCORS: true,               // Enable CORS for logo/images
-                allowTaint: true,            // Allow cross-origin images
-                letterRendering: true,       // Better font/text rendering
-                foreignObjectRendering: true, // Handle complex elements
+                useCORS: true,
+                allowTaint: true,
+                letterRendering: true,
+                foreignObjectRendering: true,
                 backgroundColor: '#ffffff',
                 logging: false,
-                width: isMobile ? 800 : 1200,
-                height: isMobile ? null : null,
-                windowWidth: isMobile ? 800 : 1200,
-                windowHeight: isMobile ? 1000 : 800,
-                ignoreElements: (el) => el.id === 'itemsContainer' || el.classList.contains('input-panel')  // Ignore hidden form elements
+                width: 800,  // Fixed width for consistent invoice size
+                height: null, // Auto height based on content
+                windowWidth: 800,
+                windowHeight: 600,
+                ignoreElements: (el) => el.id === 'itemsContainer' || el.classList.contains('input-panel')
               },
               jsPDF: { 
                 unit: 'mm', 
-                format: 'a4', 
+                format: 'a4',  // Keep A4 but with zero margins it fits content tightly
                 orientation: 'portrait',
-                compress: false  // Disable compression for max quality (re-enable if file size is an issue)
-              }
+                compress: false
+              },
+              pagebreak: { mode: ['avoid-all', 'css', 'legacy'] } // Avoid unnecessary page breaks
             };
 
             const worker = html2pdf().set(opt).from(invoiceElement).save();
@@ -1007,7 +1005,6 @@
                   console.error('PDF generation error:', error);
                   restoreOriginalStyles();
                   if (logo && originalLogoSrc) logo.setAttribute('src', originalLogoSrc);
-                  // Fallback to print on error
                   setTimeout(customPrint, 100);
                 });
             } else {
@@ -1021,19 +1018,17 @@
             if (logo && originalLogoSrc) logo.setAttribute('src', originalLogoSrc);
             customPrint();
           }
-        }, 500);  // Increased timeout for full render
+        }, 500);  // Increased timeout
       });
 
-      // Function to restore original styles (enhanced)
+      // Function to restore original styles
       function restoreOriginalStyles() {
         inputPanel.style.display = 'block';
-        document.body.style.width = '';
-        document.body.style.transform = '';
-        document.body.style.transformOrigin = '';
+        document.body.style.padding = '';
+        invoiceElement.style.padding = '';
+        invoiceElement.style.margin = '';
         invoiceElement.style.width = '';
         invoiceElement.style.maxWidth = '';
-        invoiceElement.style.margin = '';
-        invoiceElement.style.padding = '';
         
         const table = invoiceElement.querySelector('table');
         if (table) {
@@ -1045,6 +1040,7 @@
         if (header) {
           header.style.flexDirection = '';
           header.style.justifyContent = '';
+          header.style.marginBottom = '';
         }
         
         const brandBlock = invoiceElement.querySelector('.brand-block');
