@@ -909,56 +909,63 @@
       }, 100);
     }
     
-    // Simplified, stable Download PDF function
-    function downloadPDF() {
-      const inputPanel = document.querySelector('.input-panel');
-      const invoiceElement = document.querySelector('.page');
+   // Simplified, stable Download PDF function
+function downloadPDF() {
+  const inputPanel = document.querySelector('.input-panel');
+  const invoiceElement = document.querySelector('.page');
 
-      if (typeof html2pdf === 'undefined') {
-        customPrint();
-        return;
-      }
+  if (typeof html2pdf === 'undefined') {
+    customPrint();
+    return;
+  }
 
-      const originalBodyPadding = document.body.style.padding;
+  const originalBodyPadding = document.body.style.padding;
 
-      // Hide side panel and remove body padding so only invoice is captured
-      inputPanel.style.display = 'none';
-      document.body.style.padding = '0';
+  // Hide side panel and remove body padding so only invoice is captured
+  inputPanel.style.display = 'none';
+  document.body.style.padding = '0';
 
-      const opt = {
-        margin: [10, 10, 10, 10],
-        filename: `Sunset_Escape_Invoice_${invoiceData.invoiceNumber || new Date().getTime()}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: {
-          scale: 2,
-          useCORS: true,
-          backgroundColor: '#ffffff',
-          logging: false
-        },
-        jsPDF: {
-          unit: 'mm',
-          format: 'a4',
-          orientation: 'portrait'
-        }
-      };
+  // 🔹 Get the exact size of the invoice on screen
+  const rect = invoiceElement.getBoundingClientRect();
+  const pdfWidth = rect.width;
+  const pdfHeight = rect.height;
 
-      html2pdf()
-        .set(opt)
-        .from(invoiceElement)
-        .save()
-        .then(() => {
-          // restore UI
-          inputPanel.style.display = 'block';
-          document.body.style.padding = originalBodyPadding;
-        })
-        .catch(err => {
-          console.error('PDF generation error:', err);
-          inputPanel.style.display = 'block';
-          document.body.style.padding = originalBodyPadding;
-          // fallback
-          customPrint();
-        });
+  const opt = {
+    margin: 0,   // no extra white area
+    filename: `Sunset_Escape_Invoice_${invoiceData.invoiceNumber || new Date().getTime()}.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      logging: false
+    },
+    // 🔹 Make PDF page exactly same size as the invoice element
+    jsPDF: {
+      unit: 'px',
+      format: [pdfWidth, pdfHeight],
+      orientation: 'portrait'
     }
+  };
+
+  html2pdf()
+    .set(opt)
+    .from(invoiceElement)
+    .save()
+    .then(() => {
+      // restore UI
+      inputPanel.style.display = 'block';
+      document.body.style.padding = originalBodyPadding;
+    })
+    .catch(err => {
+      console.error('PDF generation error:', err);
+      inputPanel.style.display = 'block';
+      document.body.style.padding = originalBodyPadding;
+      // fallback
+      customPrint();
+    });
+}
+
 
     // Initialize when page loads
     document.addEventListener('DOMContentLoaded', initializeForm);
