@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -8,6 +9,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="format-detection" content="telephone=no">
   <title>Automated Invoice Generator - Sunset Escape</title>
+
   <style>
     * {
       box-sizing: border-box;
@@ -61,7 +63,9 @@
       color: #333;
     }
 
-    .form-group input, .form-group textarea {
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
       width: 100%;
       padding: 12px;
       border: 2px solid #ddd;
@@ -71,9 +75,12 @@
       appearance: none;
       min-height: 44px;
       box-sizing: border-box;
+      background: #ffffff;
     }
 
-    .form-group input:focus, .form-group textarea:focus {
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
       border-color: #E1C571;
       outline: none;
       box-shadow: 0 0 0 3px rgba(225, 197, 113, 0.2);
@@ -115,7 +122,8 @@
       min-width: 120px;
     }
 
-    .item-row .qty-input, .item-row .price-input {
+    .item-row .qty-input,
+    .item-row .price-input {
       flex: 1;
       max-width: 90px;
       min-width: 60px;
@@ -148,7 +156,8 @@
       transition: background-color 0.2s ease;
     }
 
-    .add-item-btn:hover, .add-item-btn:active {
+    .add-item-btn:hover,
+    .add-item-btn:active {
       background: #d4b560;
     }
 
@@ -250,7 +259,26 @@
       font-size: 26px;
       font-weight: 700;
       text-transform: uppercase;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
+    }
+
+    /* PAID BADGE */
+    .status-badge {
+      display: none;
+      margin-top: 6px;
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+      color: #1b5e20;
+      text-transform: uppercase;
+    }
+
+    /* Receipt reference line */
+    .receipt-ref {
+      display: none;
+      margin-top: 10px;
+      font-size: 13px;
+      color: #000000;
     }
 
     .meta-table {
@@ -369,24 +397,24 @@
         size: 900px 1200px;
         margin: 0;
       }
-      
+
       * {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
-      
+
       html {
         width: 900px !important;
         height: auto !important;
       }
-      
+
       body {
         background: #ffffff !important;
         padding: 0 !important;
         margin: 0 !important;
         width: 900px !important;
       }
-      
+
       .page {
         width: 900px !important;
         height: auto !important;
@@ -396,41 +424,41 @@
         border-radius: 0 !important;
         page-break-inside: avoid !important;
       }
-      
+
       .header {
         border-bottom: 3px solid #E1C571 !important;
         width: 100% !important;
         margin-bottom: 30px !important;
         padding-bottom: 15px !important;
       }
-      
+
       .brand-logo {
         width: 80px !important;
         height: auto !important;
       }
-      
+
       table {
         width: 100% !important;
         border-collapse: collapse !important;
         font-size: 14px !important;
       }
-      
+
       thead tr {
         background: #E1C571 !important;
         color: #000000 !important;
       }
-      
+
       thead th {
         background: #E1C571 !important;
         color: #000000 !important;
         padding: 10px 8px !important;
       }
-      
+
       tbody td {
         padding: 10px 8px !important;
         border-bottom: 1px solid #eeeeee !important;
       }
-      
+
       .summary-block {
         max-width: 280px !important;
         margin-left: auto !important;
@@ -438,70 +466,73 @@
         border-top: 2px solid #000000 !important;
         padding-top: 8px !important;
       }
-      
+
       .summary-total {
         border-top: 2px solid #E1C571 !important;
         margin-top: 6px !important;
         padding-top: 6px !important;
       }
-      
+
       .footer {
         margin-top: 35px !important;
         border-top: 1px solid #dddddd !important;
         padding-top: 10px !important;
       }
-      
+
       .invoice-preview {
         width: 900px !important;
         margin: 0 auto !important;
       }
-      
+
       .container {
         display: block !important;
         width: 900px !important;
         margin: 0 auto !important;
       }
-      
-      body, html {
+
+      body,
+      html {
         overflow: visible !important;
       }
-      
+
       body * {
         overflow: visible !important;
         transform: none !important;
       }
-      
+
       .page * {
         overflow: visible !important;
         transform: none !important;
       }
-      
-      .page, .page * {
+
+      .page,
+      .page * {
         box-shadow: none !important;
         border-radius: 0 !important;
       }
-      
+
       body {
         position: static !important;
       }
-      
+
       * {
         position: static !important;
       }
-      
-      html, body {
+
+      html,
+      body {
         padding: 0 !important;
         margin: 0 !important;
         overflow: visible !important;
         transform: scale(1) !important;
         zoom: 1 !important;
       }
-      
+
       .input-panel {
         display: none !important;
         visibility: hidden !important;
       }
-      
+
       .container {
         display: block !important;
         width: 900px !important;
@@ -515,6 +546,7 @@
         flex-direction: column;
         gap: 20px;
       }
+
       .input-panel {
         width: 100%;
         position: relative;
@@ -528,65 +560,65 @@
       body {
         padding: 15px;
       }
-      
+
       .container {
         gap: 15px;
       }
-      
+
       .input-panel {
         padding: 20px;
         border-radius: 6px;
       }
-      
+
       .input-panel h2 {
         font-size: 22px;
         margin-bottom: 15px;
       }
-      
+
       .page {
         padding: 30px 25px;
         border-radius: 6px;
       }
-      
+
       .header {
         flex-direction: column;
         gap: 15px;
         align-items: flex-start;
       }
-      
+
       .brand-block {
         max-width: 100%;
       }
-      
+
       .invoice-block {
         text-align: left;
       }
-      
+
       .meta-table {
         margin-left: 0;
       }
-      
+
       .brand-logo {
         width: 60px;
       }
-      
+
       .brand-name {
         font-size: 24px;
       }
-      
+
       table {
         font-size: 13px;
       }
-      
+
       thead th {
         padding: 8px 6px;
         font-size: 11px;
       }
-      
+
       tbody td {
         padding: 8px 6px;
       }
-      
+
       .action-buttons {
         flex-direction: row;
         gap: 10px;
@@ -597,103 +629,129 @@
       body {
         padding: 10px;
       }
-      
+
       .input-panel {
         padding: 15px;
       }
-      
+
       .form-group {
         margin-bottom: 15px;
       }
-      
+
       .items-section {
         padding: 15px;
       }
-      
+
       .item-row {
         flex-direction: column;
         gap: 5px;
       }
-      
+
       .item-row input {
         min-height: 44px;
       }
-      
+
       .add-item-btn {
         min-height: 44px;
       }
-      
+
       .btn {
         min-height: 44px;
       }
-      
+
       .page {
         padding: 20px 15px;
       }
-      
+
       .header {
         flex-direction: column;
         gap: 10px;
       }
-      
+
       .brand-block {
         justify-content: center;
         text-align: center;
       }
-      
+
       .invoice-block {
         text-align: center;
       }
-      
+
       .meta-table {
         margin: 0 auto;
       }
-      
+
       .brand-logo {
         width: 50px;
       }
-      
+
       .brand-name {
         font-size: 20px;
       }
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <!-- INPUT PANEL -->
     <div class="input-panel">
       <h2>Invoice Generator</h2>
-      
-      <!-- Invoice Details -->
+
+      <!-- Document Type -->
       <div class="form-group">
-        <label for="invoiceNumber">Invoice Number</label>
+        <label for="documentType">Document Type</label>
+        <select id="documentType" onchange="updateInvoice()">
+          <option value="invoice">Invoice (Final)</option>
+          <option value="advance">Advance Payment Receipt</option>
+          <option value="proforma">Proforma Invoice / Quotation</option>
+          <option value="receipt">Payment Receipt</option>
+        </select>
+      </div>
+
+      <!-- Reference Number -->
+      <div class="form-group">
+        <label for="invoiceNumber">Reference Number</label>
         <input type="text" id="invoiceNumber" value="000144" onchange="updateInvoice()">
       </div>
-      
+
+      <!-- Date -->
       <div class="form-group">
-        <label for="invoiceDate">Invoice Date</label>
+        <label for="invoiceDate">Date</label>
         <input type="date" id="invoiceDate" value="2025-11-09" onchange="updateInvoice()">
       </div>
 
       <!-- Items Section -->
       <div class="items-section">
         <h3>Booking Items</h3>
-        <div id="itemsContainer">
-          <!-- Items will be populated here -->
-        </div>
+        <div id="itemsContainer"></div>
         <button class="add-item-btn" onclick="addNewItem()">+ Add Item</button>
       </div>
 
-      <!-- Advanced Payment -->
+      <!-- Amount paid -->
       <div class="form-group">
-        <label for="advancedPayment">Advanced Payment (LKR)</label>
+        <label for="advancedPayment" id="amountPaidLabel">Advanced / Amount Paid (LKR)</label>
         <input type="number" id="advancedPayment" value="42000" onchange="updateInvoice()">
+      </div>
+
+      <!-- Payment method + reference (shown for advance & receipt only) -->
+      <div class="form-group" id="paymentMethodGroup" style="display:none;">
+        <label for="paymentMethod">Payment Method</label>
+        <select id="paymentMethod" onchange="updateInvoice()">
+          <option value="Bank Transfer">Bank Transfer</option>
+          <option value="Cash">Cash</option>
+          <option value="Online Payment">Online Payment</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="transactionRefGroup" style="display:none;">
+        <label for="transactionRef">Transaction Reference</label>
+        <input type="text" id="transactionRef" placeholder="Bank slip / Ref No" onchange="updateInvoice()">
       </div>
 
       <!-- Action Buttons -->
       <div class="action-buttons">
-        <button class="btn btn-primary" onclick="customPrint()">Print Invoice</button>
+        <button class="btn btn-primary" onclick="customPrint()">Print</button>
         <button class="btn btn-secondary" onclick="downloadPDF()">Download PDF</button>
       </div>
     </div>
@@ -716,10 +774,14 @@
           </div>
 
           <div class="invoice-block">
-            <div class="invoice-title">Invoice</div>
+            <div class="invoice-title" id="documentTitle">Invoice</div>
+
+            <!-- STATUS: PAID (Receipt mode) -->
+            <div class="status-badge" id="paymentStatus">STATUS: PAID</div>
+
             <table class="meta-table">
               <tr>
-                <td class="meta-label">Invoice #</td>
+                <td class="meta-label" id="metaLabel">Invoice #</td>
                 <td id="displayInvoiceNumber">000144</td>
               </tr>
               <tr>
@@ -728,6 +790,12 @@
               </tr>
             </table>
           </div>
+        </div>
+
+        <!-- Receipt reference line (Receipt mode) -->
+        <div class="receipt-ref" id="receiptRef">
+          Received against Invoice No: <strong id="receiptInvoiceRef"></strong>
+          <span id="paymentMetaInline" style="display:block;margin-top:4px;"></span>
         </div>
 
         <!-- BOOKING TABLE -->
@@ -741,25 +809,23 @@
                 <th class="col-total">Total</th>
               </tr>
             </thead>
-            <tbody id="invoiceItemsTable">
-              <!-- Items will be populated here -->
-            </tbody>
+            <tbody id="invoiceItemsTable"></tbody>
           </table>
         </div>
 
         <!-- SUMMARY -->
         <div class="summary-block">
-          <div class="summary-row">
-            <span class="summary-label">Sub Total</span>
-            <span id="subTotal">68,500</span>
+          <div class="summary-row" id="summaryRow1">
+            <span class="summary-label" id="summaryLabel1">Sub Total</span>
+            <span id="subTotal">0</span>
           </div>
-          <div class="summary-row">
-            <span class="summary-label">Advanced</span>
-            <span id="advancedAmount">42,000</span>
+          <div class="summary-row" id="summaryRow2">
+            <span class="summary-label" id="summaryLabel2">Advanced</span>
+            <span id="advancedAmount">0</span>
           </div>
-          <div class="summary-row summary-total">
-            <span>Total</span>
-            <span id="totalAmount">26,500</span>
+          <div class="summary-row summary-total" id="summaryRow3">
+            <span class="summary-label" id="summaryLabel3">Total</span>
+            <span id="totalAmount">0</span>
           </div>
         </div>
 
@@ -775,38 +841,64 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <script>
+    // Helper function to get today's date in YYYY-MM-DD format
+    function getTodayDate() {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    // Helper function to get the next invoice number from localStorage
+    function getNextInvoiceNumber() {
+      const STORAGE_KEY = 'sunsetEscapeLastInvoiceNumber';
+      let lastNumber = parseInt(localStorage.getItem(STORAGE_KEY) || '158', 10);
+      return String(lastNumber).padStart(6, '0');
+    }
+
+    // Helper function to save and increment the invoice number
+    function saveAndIncrementInvoiceNumber(currentNumber) {
+      const STORAGE_KEY = 'sunsetEscapeLastInvoiceNumber';
+      const numValue = parseInt(currentNumber, 10);
+      if (!isNaN(numValue)) {
+        localStorage.setItem(STORAGE_KEY, String(numValue + 1));
+      }
+    }
+
     // Invoice data structure
     let invoiceData = {
-      invoiceNumber: '000144',
-      date: '2025-11-09',
-      items: [
-        { description: '09 November 2025 Day Out Booking', quantity: 1, unitPrice: 50000 },
-        { description: 'Additional 7 pax', quantity: 7, unitPrice: 2500 },
-        { description: 'Kitchen Charges', quantity: 1, unitPrice: 1000 }
-      ],
-      advancedPayment: 42000
+      documentType: 'invoice', // 'invoice' | 'advance' | 'proforma' | 'receipt'
+      invoiceNumber: getNextInvoiceNumber(),
+      date: getTodayDate(),
+      items: [],
+      advancedPayment: 0,
+      paymentMethod: 'Bank Transfer',
+      transactionRef: ''
     };
 
-    // Initialize the form
     function initializeForm() {
+      document.getElementById('documentType').value = invoiceData.documentType;
       document.getElementById('invoiceNumber').value = invoiceData.invoiceNumber;
       document.getElementById('invoiceDate').value = invoiceData.date;
       document.getElementById('advancedPayment').value = invoiceData.advancedPayment;
-      
+
+      document.getElementById('paymentMethod').value = invoiceData.paymentMethod;
+      document.getElementById('transactionRef').value = invoiceData.transactionRef;
+
       renderItems();
       updateInvoice();
     }
 
-    // Render items in the input panel
     function renderItems() {
       const container = document.getElementById('itemsContainer');
       container.innerHTML = '';
-      
+
       invoiceData.items.forEach((item, index) => {
         const itemDiv = document.createElement('div');
         itemDiv.className = 'item-row';
         itemDiv.innerHTML = `
-          <input type="text" class="desc-input" placeholder="Description" value="${item.description}" 
+          <input type="text" class="desc-input" placeholder="Description" value="${escapeHtml(item.description)}"
                  onchange="updateItem(${index}, 'description', this.value)">
           <input type="number" class="qty-input" placeholder="Qty" value="${item.quantity}" min="1"
                  onchange="updateItem(${index}, 'quantity', parseFloat(this.value))">
@@ -818,89 +910,202 @@
       });
     }
 
-    // Update individual item
+    function escapeHtml(str) {
+      return (str ?? '').toString()
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
     function updateItem(index, field, value) {
       invoiceData.items[index][field] = value;
       updateInvoice();
     }
 
-    // Add new item
     function addNewItem() {
       invoiceData.items.push({ description: '', quantity: 1, unitPrice: 0 });
       renderItems();
       updateInvoice();
     }
 
-    // Remove item
     function removeItem(index) {
       invoiceData.items.splice(index, 1);
       renderItems();
       updateInvoice();
     }
 
-    // Format currency
     function formatCurrency(amount) {
+      if (isNaN(amount)) return '0';
       return amount.toLocaleString();
     }
 
-    // Format date for display
     function formatDate(dateString) {
+      if (!dateString) return '';
       const date = new Date(dateString);
+      if (isNaN(date.getTime())) return '';
       const day = date.getDate().toString().padStart(2, '0');
       const month = (date.getMonth() + 1).toString().padStart(2, '0');
       const year = date.getFullYear();
       return `${day} / ${month} / ${year}`;
     }
 
-    // Update invoice preview
+    function getDocumentTitle(type) {
+      switch (type) {
+        case 'advance':
+          return 'Advance Payment Receipt';
+        case 'proforma':
+          return 'Proforma Invoice / Quotation';
+        case 'receipt':
+          return 'Payment Receipt';
+        default:
+          return 'Invoice';
+      }
+    }
+
+    function getMetaLabel(type) {
+      if (type === 'advance' || type === 'receipt') return 'Receipt #';
+      return 'Invoice #';
+    }
+
     function updateInvoice() {
-      // Update basic info
+      // Read form values
+      invoiceData.documentType = document.getElementById('documentType').value;
       invoiceData.invoiceNumber = document.getElementById('invoiceNumber').value;
       invoiceData.date = document.getElementById('invoiceDate').value;
       invoiceData.advancedPayment = parseFloat(document.getElementById('advancedPayment').value) || 0;
 
-      // Update display
-      document.getElementById('displayInvoiceNumber').textContent = invoiceData.invoiceNumber;
+      invoiceData.paymentMethod = document.getElementById('paymentMethod').value;
+      invoiceData.transactionRef = document.getElementById('transactionRef').value;
+
+      // Update header title & labels
+      const docTitle = getDocumentTitle(invoiceData.documentType);
+      document.getElementById('documentTitle').textContent = docTitle;
+      document.getElementById('metaLabel').textContent = getMetaLabel(invoiceData.documentType);
+
+      // Update date and number
+      document.getElementById('displayInvoiceNumber').textContent = invoiceData.invoiceNumber || '';
       document.getElementById('displayInvoiceDate').textContent = formatDate(invoiceData.date);
 
-      // Update items table
+      // Show/hide payment fields (advance + receipt only)
+      const showPaymentFields = (invoiceData.documentType === 'advance' || invoiceData.documentType === 'receipt');
+      document.getElementById('paymentMethodGroup').style.display = showPaymentFields ? 'block' : 'none';
+      document.getElementById('transactionRefGroup').style.display = showPaymentFields ? 'block' : 'none';
+
+      // Amount label tweak
+      const amountPaidLabel = document.getElementById('amountPaidLabel');
+      if (invoiceData.documentType === 'invoice') amountPaidLabel.textContent = 'Advanced / Amount Paid (LKR)';
+      if (invoiceData.documentType === 'advance') amountPaidLabel.textContent = 'Advance Paid (LKR)';
+      if (invoiceData.documentType === 'proforma') amountPaidLabel.textContent = 'Advance / Amount Paid (LKR)';
+      if (invoiceData.documentType === 'receipt') amountPaidLabel.textContent = 'Amount Received (LKR)';
+
+      // STATUS: PAID (Receipt only)
+      const paymentStatusEl = document.getElementById('paymentStatus');
+      paymentStatusEl.style.display = (invoiceData.documentType === 'receipt') ? 'block' : 'none';
+
+      // Receipt reference line (Receipt only)
+      const receiptRef = document.getElementById('receiptRef');
+      const receiptInvoiceRef = document.getElementById('receiptInvoiceRef');
+      const paymentMetaInline = document.getElementById('paymentMetaInline');
+
+      if (invoiceData.documentType === 'receipt') {
+        receiptRef.style.display = 'block';
+        receiptInvoiceRef.textContent = invoiceData.invoiceNumber || '';
+
+        const parts = [];
+        if (invoiceData.paymentMethod) parts.push(`Method: <strong>${escapeHtml(invoiceData.paymentMethod)}</strong>`);
+        if (invoiceData.transactionRef) parts.push(`Ref: <strong>${escapeHtml(invoiceData.transactionRef)}</strong>`);
+        paymentMetaInline.innerHTML = parts.length ? parts.join(' &nbsp; | &nbsp; ') : '';
+      } else {
+        receiptRef.style.display = 'none';
+        paymentMetaInline.innerHTML = '';
+      }
+
+      // Update items table and subtotal
       const tableBody = document.getElementById('invoiceItemsTable');
       tableBody.innerHTML = '';
-      
+
       let subTotal = 0;
-      
       invoiceData.items.forEach(item => {
-        const total = item.quantity * item.unitPrice;
+        const qty = parseFloat(item.quantity) || 0;
+        const price = parseFloat(item.unitPrice) || 0;
+        const total = qty * price;
         subTotal += total;
-        
+
         const row = document.createElement('tr');
         row.innerHTML = `
-          <td class="col-desc">${item.description}</td>
-          <td class="col-qty">${item.quantity}</td>
-          <td class="col-unit amount">${formatCurrency(item.unitPrice)}</td>
+          <td class="col-desc">${escapeHtml(item.description)}</td>
+          <td class="col-qty">${qty}</td>
+          <td class="col-unit amount">${formatCurrency(price)}</td>
           <td class="col-total amount">${formatCurrency(total)}</td>
         `;
         tableBody.appendChild(row);
       });
 
-      // Update summary
-      const totalAmount = subTotal - invoiceData.advancedPayment;
-      document.getElementById('subTotal').textContent = formatCurrency(subTotal);
-      document.getElementById('advancedAmount').textContent = formatCurrency(invoiceData.advancedPayment);
-      document.getElementById('totalAmount').textContent = formatCurrency(totalAmount);
+      // Summary elements
+      const row1 = document.getElementById('summaryRow1');
+      const row2 = document.getElementById('summaryRow2');
+      const row3 = document.getElementById('summaryRow3');
+
+      const label1 = document.getElementById('summaryLabel1');
+      const label2 = document.getElementById('summaryLabel2');
+      const label3 = document.getElementById('summaryLabel3');
+
+      const subTotalEl = document.getElementById('subTotal');
+      const advancedEl = document.getElementById('advancedAmount');
+      const totalEl = document.getElementById('totalAmount');
+
+      // Default: show all rows
+      row1.style.display = 'flex';
+      row2.style.display = 'flex';
+      row3.style.display = 'flex';
+
+      let totalAmount = subTotal - invoiceData.advancedPayment;
+
+      // Adjust labels and visibility per document type
+      if (invoiceData.documentType === 'invoice') {
+        label1.textContent = 'Sub Total';
+        label2.textContent = 'Advanced';
+        label3.textContent = 'Balance Payable';
+
+      } else if (invoiceData.documentType === 'advance') {
+        label1.textContent = 'Total Booking Value';
+        label2.textContent = 'Advance Paid';
+        label3.textContent = 'Balance Payable';
+
+      } else if (invoiceData.documentType === 'proforma') {
+        label1.textContent = 'Estimated Total';
+        row2.style.display = 'none';
+        row3.style.display = 'none';
+
+      } else if (invoiceData.documentType === 'receipt') {
+        label1.textContent = 'Invoice Total';
+        label2.textContent = 'Amount Received';
+        label3.textContent = 'Balance Due';
+
+        // Typically receipts are issued when paid-in-full; enforce sensible display
+        if (invoiceData.advancedPayment >= subTotal) {
+          totalAmount = 0;
+        }
+      }
+
+      // Update numeric values
+      subTotalEl.textContent = formatCurrency(subTotal);
+      advancedEl.textContent = formatCurrency(invoiceData.advancedPayment);
+      totalEl.textContent = formatCurrency(totalAmount < 0 ? 0 : totalAmount);
     }
 
-    // Custom print function
     function customPrint() {
       const inputPanel = document.querySelector('.input-panel');
       inputPanel.style.display = 'none';
-      
+
       document.body.style.width = '900px';
       document.body.style.maxWidth = '900px';
       document.body.style.minWidth = '900px';
-      
+
       window.print();
-      
+
       setTimeout(() => {
         inputPanel.style.display = 'block';
         document.body.style.width = '';
@@ -908,8 +1113,20 @@
         document.body.style.minWidth = '';
       }, 100);
     }
-    
-    // Simplified, stable Download PDF function
+
+    function getFileDocTypeName(type) {
+      switch (type) {
+        case 'advance':
+          return 'Advance_Receipt';
+        case 'proforma':
+          return 'Proforma_Invoice';
+        case 'receipt':
+          return 'Payment_Receipt';
+        default:
+          return 'Invoice';
+      }
+    }
+
     function downloadPDF() {
       const inputPanel = document.querySelector('.input-panel');
       const invoiceElement = document.querySelector('.page');
@@ -921,23 +1138,43 @@
 
       const originalBodyPadding = document.body.style.padding;
 
-      // Hide side panel and remove body padding so only invoice is captured
+      const originalStyles = {
+        margin: invoiceElement.style.margin,
+        boxShadow: invoiceElement.style.boxShadow,
+        borderRadius: invoiceElement.style.borderRadius,
+        width: invoiceElement.style.width,
+        maxWidth: invoiceElement.style.maxWidth
+      };
+
       inputPanel.style.display = 'none';
       document.body.style.padding = '0';
 
+      invoiceElement.style.margin = '0';
+      invoiceElement.style.boxShadow = 'none';
+      invoiceElement.style.borderRadius = '0';
+      invoiceElement.style.maxWidth = 'none';
+      invoiceElement.style.width = 'fit-content';
+
+      const docTypeName = getFileDocTypeName(invoiceData.documentType);
+
+      const rect = invoiceElement.getBoundingClientRect();
+      const widthMm = (rect.width * 0.264583);
+      const heightMm = (rect.height * 0.264583);
+
       const opt = {
-        margin: [10, 10, 10, 10],
-        filename: `Sunset_Escape_Invoice_${invoiceData.invoiceNumber || new Date().getTime()}.pdf`,
+        margin: [0, 0, 0, 0],
+        filename: `Sunset_Escape_${docTypeName}_${invoiceData.invoiceNumber || new Date().getTime()}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: {
           scale: 2,
           useCORS: true,
           backgroundColor: '#ffffff',
-          logging: false
+          logging: false,
+          scrollY: 0
         },
         jsPDF: {
           unit: 'mm',
-          format: 'a4',
+          format: [widthMm, heightMm],
           orientation: 'portrait'
         }
       };
@@ -947,21 +1184,40 @@
         .from(invoiceElement)
         .save()
         .then(() => {
-          // restore UI
+          // Save and auto-increment invoice number after successful PDF generation
+          saveAndIncrementInvoiceNumber(invoiceData.invoiceNumber);
+          
+          // Update to next invoice number for the next invoice
+          invoiceData.invoiceNumber = getNextInvoiceNumber();
+          document.getElementById('invoiceNumber').value = invoiceData.invoiceNumber;
+          updateInvoice();
+          
           inputPanel.style.display = 'block';
           document.body.style.padding = originalBodyPadding;
+
+          invoiceElement.style.margin = originalStyles.margin;
+          invoiceElement.style.boxShadow = originalStyles.boxShadow;
+          invoiceElement.style.borderRadius = originalStyles.borderRadius;
+          invoiceElement.style.width = originalStyles.width;
+          invoiceElement.style.maxWidth = originalStyles.maxWidth;
         })
         .catch(err => {
           console.error('PDF generation error:', err);
           inputPanel.style.display = 'block';
           document.body.style.padding = originalBodyPadding;
-          // fallback
+
+          invoiceElement.style.margin = originalStyles.margin;
+          invoiceElement.style.boxShadow = originalStyles.boxShadow;
+          invoiceElement.style.borderRadius = originalStyles.borderRadius;
+          invoiceElement.style.width = originalStyles.width;
+          invoiceElement.style.maxWidth = originalStyles.maxWidth;
+
           customPrint();
         });
     }
 
-    // Initialize when page loads
     document.addEventListener('DOMContentLoaded', initializeForm);
   </script>
 </body>
+
 </html>

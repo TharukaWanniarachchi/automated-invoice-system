@@ -612,16 +612,37 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <script>
+    // Helper function to get today's date in YYYY-MM-DD format
+    function getTodayDate() {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    // Helper function to get the next invoice number from localStorage
+    function getNextInvoiceNumber() {
+      const STORAGE_KEY = 'sunsetEscapeLastInvoiceNumber';
+      let lastNumber = parseInt(localStorage.getItem(STORAGE_KEY) || '158', 10);
+      return String(lastNumber).padStart(6, '0');
+    }
+
+    // Helper function to save and increment the invoice number
+    function saveAndIncrementInvoiceNumber(currentNumber) {
+      const STORAGE_KEY = 'sunsetEscapeLastInvoiceNumber';
+      const numValue = parseInt(currentNumber, 10);
+      if (!isNaN(numValue)) {
+        localStorage.setItem(STORAGE_KEY, String(numValue + 1));
+      }
+    }
+
     // Invoice data structure
     let invoiceData = {
-      invoiceNumber: '000144',
-      date: '2025-11-09',
-      items: [
-        { description: '09 November 2025 Day Out Booking', quantity: 1, unitPrice: 50000 },
-        { description: 'Additional 7 pax', quantity: 7, unitPrice: 2500 },
-        { description: 'Kitchen Charges', quantity: 1, unitPrice: 1000 }
-      ],
-      advancedPayment: 42000
+      invoiceNumber: getNextInvoiceNumber(),
+      date: getTodayDate(),
+      items: [],
+      advancedPayment: 0
     };
 
     // Initialize the form
@@ -838,6 +859,14 @@
           if (worker && typeof worker.then === 'function') {
             worker
               .then(() => {
+                // Save and auto-increment invoice number after successful PDF generation
+                saveAndIncrementInvoiceNumber(invoiceData.invoiceNumber);
+                
+                // Update to next invoice number for the next invoice
+                invoiceData.invoiceNumber = getNextInvoiceNumber();
+                document.getElementById('invoiceNumber').value = invoiceData.invoiceNumber;
+                updateInvoice();
+                
                 if (logo && originalLogoSrc) logo.setAttribute('src', originalLogoSrc);
                 restoreOriginalStyles();
               })
