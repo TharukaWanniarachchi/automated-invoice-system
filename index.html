@@ -1157,12 +1157,8 @@
 
       const docTypeName = getFileDocTypeName(invoiceData.documentType);
 
-      const rect = invoiceElement.getBoundingClientRect();
-      const widthMm = (rect.width * 0.264583);
-      const heightMm = (rect.height * 0.264583);
-
       const opt = {
-        margin: [0, 0, 0, 0],
+        margin: [10, 10, 10, 10],
         filename: `Sunset_Escape_${docTypeName}_${invoiceData.invoiceNumber || new Date().getTime()}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: {
@@ -1174,7 +1170,7 @@
         },
         jsPDF: {
           unit: 'mm',
-          format: [widthMm, heightMm],
+          format: 'a4',
           orientation: 'portrait'
         }
       };
