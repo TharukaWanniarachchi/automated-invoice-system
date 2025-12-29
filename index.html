@@ -21,7 +21,12 @@
     body {
       background: #f4f4f4;
       padding: 20px;
+      padding-top: max(20px, env(safe-area-inset-top));
+      padding-bottom: max(20px, env(safe-area-inset-bottom));
+      padding-left: max(20px, env(safe-area-inset-left));
+      padding-right: max(20px, env(safe-area-inset-right));
       color: #000000;
+      -webkit-overflow-scrolling: touch;
     }
 
     .container {
@@ -76,6 +81,8 @@
       min-height: 44px;
       box-sizing: border-box;
       background: #ffffff;
+      -webkit-tap-highlight-color: rgba(225, 197, 113, 0.3);
+      touch-action: manipulation;
     }
 
     .form-group input:focus,
@@ -140,6 +147,14 @@
       min-width: 40px;
       font-size: 16px;
       font-weight: bold;
+      -webkit-tap-highlight-color: rgba(220, 53, 69, 0.3);
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .item-row button:active {
+      background: #c82333;
     }
 
     .add-item-btn {
@@ -154,6 +169,10 @@
       font-size: 16px;
       min-height: 48px;
       transition: background-color 0.2s ease;
+      -webkit-tap-highlight-color: rgba(225, 197, 113, 0.3);
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     .add-item-btn:hover,
@@ -177,6 +196,10 @@
       font-size: 16px;
       min-height: 48px;
       transition: all 0.2s ease;
+      -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     .btn-primary {
@@ -184,9 +207,17 @@
       color: black;
     }
 
+    .btn-primary:active {
+      background: #d4b560;
+    }
+
     .btn-secondary {
       background: #6c757d;
       color: white;
+    }
+
+    .btn-secondary:active {
+      background: #5a6268;
     }
 
     /* INVOICE PREVIEW */
@@ -556,6 +587,22 @@
       }
     }
 
+    /* iPad specific */
+    @media (min-width: 768px) and (max-width: 1024px) {
+      .container {
+        max-width: 100%;
+        padding: 0 20px;
+      }
+
+      .input-panel {
+        max-width: 700px;
+      }
+
+      .page {
+        max-width: 800px;
+      }
+    }
+
     @media (max-width: 768px) {
       body {
         padding: 15px;
@@ -881,10 +928,15 @@
       document.getElementById('documentType').value = invoiceData.documentType;
       document.getElementById('invoiceNumber').value = invoiceData.invoiceNumber;
       document.getElementById('invoiceDate').value = invoiceData.date;
-      document.getElementById('advancedPayment').value = invoiceData.advancedPayment;
+      document.getElementById('advancedPayment').value = invoiceData.advancedPayment || 0;
 
       document.getElementById('paymentMethod').value = invoiceData.paymentMethod;
       document.getElementById('transactionRef').value = invoiceData.transactionRef;
+
+      // Add input event listeners for real-time validation
+      document.getElementById('advancedPayment').addEventListener('input', function(e) {
+        if (e.target.value < 0) e.target.value = 0;
+      });
 
       renderItems();
       updateInvoice();
@@ -920,6 +972,15 @@
     }
 
     function updateItem(index, field, value) {
+      if (field === 'quantity' || field === 'unitPrice') {
+        // Validate numeric input
+        const numValue = parseFloat(value);
+        if (isNaN(numValue) || numValue < 0) {
+          value = 0;
+        } else {
+          value = numValue;
+        }
+      }
       invoiceData.items[index][field] = value;
       updateInvoice();
     }
@@ -1130,10 +1191,22 @@
     function downloadPDF() {
       const inputPanel = document.querySelector('.input-panel');
       const invoiceElement = document.querySelector('.page');
+      const logo = document.querySelector('.brand-logo');
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
       if (typeof html2pdf === 'undefined') {
         customPrint();
         return;
+      }
+
+      // Show loading state on mobile
+      if (isMobile) {
+        const btn = event ? event.target : null;
+        if (btn) {
+          btn.disabled = true;
+          btn.textContent = 'Generating...';
+        }
       }
 
       const originalBodyPadding = document.body.style.padding;
@@ -1162,16 +1235,20 @@
         filename: `Sunset_Escape_${docTypeName}_${invoiceData.invoiceNumber || new Date().getTime()}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: {
-          scale: 2,
+          scale: isMobile ? 2 : 2,
           useCORS: true,
+          allowTaint: true,
           backgroundColor: '#ffffff',
           logging: false,
-          scrollY: 0
+          scrollY: 0,
+          windowWidth: isMobile ? 800 : invoiceElement.scrollWidth,
+          windowHeight: isMobile ? 1200 : invoiceElement.scrollHeight
         },
         jsPDF: {
           unit: 'mm',
           format: 'a4',
-          orientation: 'portrait'
+          orientation: 'portrait',
+          compress: true
         }
       };
 
@@ -1196,6 +1273,20 @@
           invoiceElement.style.borderRadius = originalStyles.borderRadius;
           invoiceElement.style.width = originalStyles.width;
           invoiceElement.style.maxWidth = originalStyles.maxWidth;
+
+          // Reset button state on mobile
+          if (isMobile) {
+            const btn = event ? event.target : document.querySelector('.btn-secondary');
+            if (btn) {
+              btn.disabled = false;
+              btn.textContent = 'Download PDF';
+            }
+          }
+
+          // Show success message on mobile
+          if (isMobile && isIOS) {
+            alert('PDF generated successfully! Check your Files app or browser downloads.');
+          }
         })
         .catch(err => {
           console.error('PDF generation error:', err);
@@ -1207,6 +1298,16 @@
           invoiceElement.style.borderRadius = originalStyles.borderRadius;
           invoiceElement.style.width = originalStyles.width;
           invoiceElement.style.maxWidth = originalStyles.maxWidth;
+
+          // Reset button state on mobile
+          if (isMobile) {
+            const btn = event ? event.target : document.querySelector('.btn-secondary');
+            if (btn) {
+              btn.disabled = false;
+              btn.textContent = 'Download PDF';
+            }
+            alert('PDF generation failed. Falling back to print...');
+          }
 
           customPrint();
         });

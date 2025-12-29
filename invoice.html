@@ -19,7 +19,12 @@
     body {
       background: #f4f4f4;
       padding: 20px;
+      padding-top: max(20px, env(safe-area-inset-top));
+      padding-bottom: max(20px, env(safe-area-inset-bottom));
+      padding-left: max(20px, env(safe-area-inset-left));
+      padding-right: max(20px, env(safe-area-inset-right));
       color: #000000;
+      -webkit-overflow-scrolling: touch;
     }
 
     .container {
@@ -66,6 +71,11 @@
       border: 2px solid #ddd;
       border-radius: 4px;
       font-size: 14px;
+      min-height: 44px;
+      -webkit-appearance: none;
+      appearance: none;
+      -webkit-tap-highlight-color: rgba(225, 197, 113, 0.3);
+      touch-action: manipulation;
     }
 
     .form-group input:focus, .form-group textarea:focus {
@@ -116,6 +126,16 @@
       padding: 8px 12px;
       border-radius: 4px;
       cursor: pointer;
+      min-height: 40px;
+      min-width: 40px;
+      -webkit-tap-highlight-color: rgba(220, 53, 69, 0.3);
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .item-row button:active {
+      background: #c82333;
     }
 
     .add-item-btn {
@@ -127,6 +147,15 @@
       cursor: pointer;
       font-weight: 600;
       width: 100%;
+      min-height: 48px;
+      -webkit-tap-highlight-color: rgba(225, 197, 113, 0.3);
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .add-item-btn:active {
+      background: #d4b560;
     }
 
     .action-buttons {
@@ -142,6 +171,11 @@
       cursor: pointer;
       font-weight: 600;
       font-size: 14px;
+      min-height: 48px;
+      -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     .btn-primary {
@@ -149,9 +183,17 @@
       color: black;
     }
 
+    .btn-primary:active {
+      background: #d4b560;
+    }
+
     .btn-secondary {
       background: #6c757d;
       color: white;
+    }
+
+    .btn-secondary:active {
+      background: #5a6268;
     }
 
     /* INVOICE PREVIEW */
@@ -649,7 +691,12 @@
     function initializeForm() {
       document.getElementById('invoiceNumber').value = invoiceData.invoiceNumber;
       document.getElementById('invoiceDate').value = invoiceData.date;
-      document.getElementById('advancedPayment').value = invoiceData.advancedPayment;
+      document.getElementById('advancedPayment').value = invoiceData.advancedPayment || 0;
+      
+      // Add input event listeners for real-time validation
+      document.getElementById('advancedPayment').addEventListener('input', function(e) {
+        if (e.target.value < 0) e.target.value = 0;
+      });
       
       renderItems();
       updateInvoice();
@@ -678,6 +725,15 @@
 
     // Update individual item
     function updateItem(index, field, value) {
+      if (field === 'quantity' || field === 'unitPrice') {
+        // Validate numeric input
+        const numValue = parseFloat(value);
+        if (isNaN(numValue) || numValue < 0) {
+          value = 0;
+        } else {
+          value = numValue;
+        }
+      }
       invoiceData.items[index][field] = value;
       updateInvoice();
     }
