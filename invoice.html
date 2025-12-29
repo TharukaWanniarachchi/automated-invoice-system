@@ -837,42 +837,30 @@
         logo.removeAttribute('src');
       }
 
+      const originalBodyPadding = document.body.style.padding;
+      const originalContainerDisplay = document.querySelector('.container').style.display;
+
+      const originalStyles = {
+        margin: invoiceElement.style.margin,
+        boxShadow: invoiceElement.style.boxShadow,
+        borderRadius: invoiceElement.style.borderRadius,
+        width: invoiceElement.style.width,
+        maxWidth: invoiceElement.style.maxWidth,
+        padding: invoiceElement.style.padding
+      };
+
       // Hide input panel and prepare for PDF generation
       inputPanel.style.display = 'none';
+      document.body.style.padding = '0';
+      document.querySelector('.container').style.display = 'block';
       
-      // Mobile-specific adjustments for PDF
-      if (isMobile) {
-        // Temporarily adjust styles for better PDF on mobile
-        document.body.style.width = '900px';
-        document.body.style.transform = 'scale(1)';
-        document.body.style.transformOrigin = 'top left';
-        invoiceElement.style.width = '800px';
-        invoiceElement.style.maxWidth = '800px';
-        invoiceElement.style.margin = '0 auto';
-        invoiceElement.style.padding = '30px 40px';
-        
-        // Fix table for PDF
-        const table = invoiceElement.querySelector('table');
-        if (table) {
-          table.style.fontSize = '12px';
-          table.style.width = '100%';
-        }
-        
-        // Fix header for mobile PDF
-        const header = invoiceElement.querySelector('.header');
-        if (header) {
-          header.style.flexDirection = 'row';
-          header.style.justifyContent = 'space-between';
-        }
-        
-        // Fix brand block
-        const brandBlock = invoiceElement.querySelector('.brand-block');
-        if (brandBlock) {
-          brandBlock.style.flexDirection = 'row';
-          brandBlock.style.alignItems = 'center';
-          brandBlock.style.maxWidth = '60%';
-        }
-      }
+      // Set fixed dimensions for consistent PDF output
+      invoiceElement.style.margin = '0 auto';
+      invoiceElement.style.boxShadow = 'none';
+      invoiceElement.style.borderRadius = '0';
+      invoiceElement.style.width = '210mm';
+      invoiceElement.style.maxWidth = '210mm';
+      invoiceElement.style.padding = '40px 50px';
       
       setTimeout(() => {
         if (typeof html2pdf === 'undefined') {
@@ -885,29 +873,32 @@
         
         try {
           const opt = {
-            margin: isMobile ? [5, 5, 5, 5] : [10, 10, 10, 10],
+            margin: [0, 0, 0, 0],
             filename: `Sunset_Escape_Invoice_${invoiceData.invoiceNumber || new Date().getTime()}.pdf`,
             image: { 
               type: 'jpeg', 
               quality: 0.98
             },
             html2canvas: { 
-              scale: isMobile ? 2 : 1.5,
+              scale: 2,
               useCORS: false,
               allowTaint: true,
               backgroundColor: '#ffffff',
               logging: false,
-              width: isMobile ? 800 : null,
-              height: isMobile ? null : null,
-              windowWidth: isMobile ? 800 : 1200,
-              windowHeight: isMobile ? 1000 : 800
+              scrollY: -window.scrollY,
+              scrollX: -window.scrollX,
+              windowWidth: 794,
+              windowHeight: 1123,
+              width: 794,
+              height: invoiceElement.scrollHeight
             },
             jsPDF: { 
               unit: 'mm', 
               format: 'a4', 
               orientation: 'portrait',
               compress: true
-            }
+            },
+            pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
           };
           
           const worker = html2pdf().set(opt).from(invoiceElement).save();
@@ -945,40 +936,20 @@
           restoreOriginalStyles();
           customPrint();
         }
-      }, 300);
+      }, 100);
       
       // Function to restore original styles
       function restoreOriginalStyles() {
         inputPanel.style.display = 'block';
-        document.body.style.width = '';
-        document.body.style.transform = '';
-        document.body.style.transformOrigin = '';
-        invoiceElement.style.width = '';
-        invoiceElement.style.maxWidth = '';
-        invoiceElement.style.margin = '';
-        invoiceElement.style.padding = '';
+        document.body.style.padding = originalBodyPadding;
+        document.querySelector('.container').style.display = originalContainerDisplay;
         
-        // Restore table
-        const table = invoiceElement.querySelector('table');
-        if (table) {
-          table.style.fontSize = '';
-          table.style.width = '';
-        }
-        
-        // Restore header
-        const header = invoiceElement.querySelector('.header');
-        if (header) {
-          header.style.flexDirection = '';
-          header.style.justifyContent = '';
-        }
-        
-        // Restore brand block
-        const brandBlock = invoiceElement.querySelector('.brand-block');
-        if (brandBlock) {
-          brandBlock.style.flexDirection = '';
-          brandBlock.style.alignItems = '';
-          brandBlock.style.maxWidth = '';
-        }
+        invoiceElement.style.margin = originalStyles.margin;
+        invoiceElement.style.boxShadow = originalStyles.boxShadow;
+        invoiceElement.style.borderRadius = originalStyles.borderRadius;
+        invoiceElement.style.width = originalStyles.width;
+        invoiceElement.style.maxWidth = originalStyles.maxWidth;
+        invoiceElement.style.padding = originalStyles.padding;
       }
     }
 

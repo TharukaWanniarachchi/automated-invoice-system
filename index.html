@@ -1210,53 +1210,64 @@
       }
 
       const originalBodyPadding = document.body.style.padding;
+      const originalContainerDisplay = document.querySelector('.container').style.display;
 
       const originalStyles = {
         margin: invoiceElement.style.margin,
         boxShadow: invoiceElement.style.boxShadow,
         borderRadius: invoiceElement.style.borderRadius,
         width: invoiceElement.style.width,
-        maxWidth: invoiceElement.style.maxWidth
+        maxWidth: invoiceElement.style.maxWidth,
+        padding: invoiceElement.style.padding
       };
 
+      // Hide input panel and prepare invoice for capture
       inputPanel.style.display = 'none';
       document.body.style.padding = '0';
+      document.querySelector('.container').style.display = 'block';
 
-      invoiceElement.style.margin = '0';
+      invoiceElement.style.margin = '0 auto';
       invoiceElement.style.boxShadow = 'none';
       invoiceElement.style.borderRadius = '0';
-      invoiceElement.style.maxWidth = 'none';
-      invoiceElement.style.width = 'fit-content';
+      invoiceElement.style.width = '210mm';
+      invoiceElement.style.maxWidth = '210mm';
+      invoiceElement.style.padding = '40px 50px';
 
       const docTypeName = getFileDocTypeName(invoiceData.documentType);
 
       const opt = {
-        margin: [10, 10, 10, 10],
+        margin: [0, 0, 0, 0],
         filename: `Sunset_Escape_${docTypeName}_${invoiceData.invoiceNumber || new Date().getTime()}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: {
-          scale: isMobile ? 2 : 2,
+          scale: 2,
           useCORS: true,
           allowTaint: true,
           backgroundColor: '#ffffff',
           logging: false,
-          scrollY: 0,
-          windowWidth: isMobile ? 800 : invoiceElement.scrollWidth,
-          windowHeight: isMobile ? 1200 : invoiceElement.scrollHeight
+          scrollY: -window.scrollY,
+          scrollX: -window.scrollX,
+          windowWidth: 794,
+          windowHeight: 1123,
+          width: 794,
+          height: invoiceElement.scrollHeight
         },
         jsPDF: {
           unit: 'mm',
           format: 'a4',
           orientation: 'portrait',
           compress: true
-        }
+        },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
       };
 
-      html2pdf()
-        .set(opt)
-        .from(invoiceElement)
-        .save()
-        .then(() => {
+      // Add small delay to ensure rendering is complete
+      setTimeout(() => {
+        html2pdf()
+          .set(opt)
+          .from(invoiceElement)
+          .save()
+          .then(() => {
           // Save and auto-increment invoice number after successful PDF generation
           saveAndIncrementInvoiceNumber(invoiceData.invoiceNumber);
           
@@ -1267,54 +1278,52 @@
           
           inputPanel.style.display = 'block';
           document.body.style.padding = originalBodyPadding;
+            document.querySelector('.container').style.display = originalContainerDisplay;
 
-          invoiceElement.style.margin = originalStyles.margin;
-          invoiceElement.style.boxShadow = originalStyles.boxShadow;
-          invoiceElement.style.borderRadius = originalStyles.borderRadius;
-          invoiceElement.style.width = originalStyles.width;
-          invoiceElement.style.maxWidth = originalStyles.maxWidth;
+            invoiceElement.style.margin = originalStyles.margin;
+            invoiceElement.style.boxShadow = originalStyles.boxShadow;
+            invoiceElement.style.borderRadius = originalStyles.borderRadius;
+            invoiceElement.style.width = originalStyles.width;
+            invoiceElement.style.maxWidth = originalStyles.maxWidth;
+            invoiceElement.style.padding = originalStyles.padding;
 
-          // Reset button state on mobile
-          if (isMobile) {
-            const btn = event ? event.target : document.querySelector('.btn-secondary');
-            if (btn) {
-              btn.disabled = false;
-              btn.textContent = 'Download PDF';
+            // Reset button state on mobile
+            if (isMobile) {
+              const btn = event ? event.target : document.querySelector('.btn-secondary');
+              if (btn) {
+                btn.disabled = false;
+                btn.textContent = 'Download PDF';
+              }
             }
-          }
 
-          // Show success message on mobile
-          if (isMobile && isIOS) {
-            alert('PDF generated successfully! Check your Files app or browser downloads.');
-          }
-        })
-        .catch(err => {
-          console.error('PDF generation error:', err);
-          inputPanel.style.display = 'block';
-          document.body.style.padding = originalBodyPadding;
-
-          invoiceElement.style.margin = originalStyles.margin;
-          invoiceElement.style.boxShadow = originalStyles.boxShadow;
-          invoiceElement.style.borderRadius = originalStyles.borderRadius;
-          invoiceElement.style.width = originalStyles.width;
-          invoiceElement.style.maxWidth = originalStyles.maxWidth;
-
-          // Reset button state on mobile
-          if (isMobile) {
-            const btn = event ? event.target : document.querySelector('.btn-secondary');
-            if (btn) {
-              btn.disabled = false;
-              btn.textContent = 'Download PDF';
+            // Show success message on mobile
+            if (isMobile && isIOS) {
+              alert('PDF generated successfully! Check your Files app or browser downloads.');
             }
-            alert('PDF generation failed. Falling back to print...');
-          }
+          })
+          .catch(err => {
+            console.error('PDF generation error:', err);
+            inputPanel.style.display = 'block';
+            document.body.style.padding = originalBodyPadding;
+            document.querySelector('.container').style.display = originalContainerDisplay;
 
-          customPrint();
-        });
-    }
+            invoiceElement.style.margin = originalStyles.margin;
+            invoiceElement.style.boxShadow = originalStyles.boxShadow;
+            invoiceElement.style.borderRadius = originalStyles.borderRadius;
+            invoiceElement.style.width = originalStyles.width;
+            invoiceElement.style.maxWidth = originalStyles.maxWidth;
+            invoiceElement.style.padding = originalStyles.padding;
 
-    document.addEventListener('DOMContentLoaded', initializeForm);
-  </script>
-</body>
+            // Reset button state on mobile
+            if (isMobile) {
+              const btn = event ? event.target : document.querySelector('.btn-secondary');
+              if (btn) {
+                btn.disabled = false;
+                btn.textContent = 'Download PDF';
+              }
+              alert('PDF generation failed. Falling back to print...');
+            }
 
-</html>
+            customPrint();
+          });
+      }, 100);
