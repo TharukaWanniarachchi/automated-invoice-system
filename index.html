@@ -8,25 +8,26 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="format-detection" content="telephone=no">
-  <title>Automated Invoice Generator - Sunset Escape</title>
+  <title>Sunset Escape - Invoice Generator</title>
 
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     }
 
     body {
-      background: #f4f4f4;
+      background: #f5f7fa;
       padding: 20px;
       padding-top: max(20px, env(safe-area-inset-top));
       padding-bottom: max(20px, env(safe-area-inset-bottom));
       padding-left: max(20px, env(safe-area-inset-left));
       padding-right: max(20px, env(safe-area-inset-right));
       color: #000000;
-      -webkit-overflow-scrolling: touch;
+      min-height: 100vh;
+      -webkit-text-size-adjust: 100%;
     }
 
     .container {
@@ -40,198 +41,230 @@
     .input-panel {
       width: 400px;
       background: #ffffff;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
       height: fit-content;
       position: sticky;
       top: 20px;
-      min-width: 320px;
+      min-width: 350px;
+      border: 1px solid #e0e0e0;
     }
 
     .input-panel h2 {
-      color: #E1C571;
-      margin-bottom: 20px;
-      font-size: 24px;
-      border-bottom: 2px solid #E1C571;
-      padding-bottom: 10px;
+      color: #333;
+      margin-bottom: 25px;
+      font-size: 26px;
+      border-bottom: 2px solid #333;
+      padding-bottom: 12px;
+      text-align: center;
+      font-weight: 600;
     }
 
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: 22px;
     }
 
     .form-group label {
       display: block;
-      margin-bottom: 5px;
+      margin-bottom: 8px;
       font-weight: 600;
-      color: #333;
+      color: #2c3e50;
+      font-size: 15px;
     }
 
     .form-group input,
     .form-group textarea,
     .form-group select {
       width: 100%;
-      padding: 12px;
+      padding: 14px 16px;
       border: 2px solid #ddd;
-      border-radius: 6px;
+      border-radius: 8px;
       font-size: 16px;
       -webkit-appearance: none;
       appearance: none;
-      min-height: 44px;
+      min-height: 50px;
       box-sizing: border-box;
       background: #ffffff;
-      -webkit-tap-highlight-color: rgba(225, 197, 113, 0.3);
-      touch-action: manipulation;
+      transition: all 0.3s ease;
+      -webkit-tap-highlight-color: transparent;
+      color: #333;
     }
 
     .form-group input:focus,
     .form-group textarea:focus,
     .form-group select:focus {
-      border-color: #E1C571;
+      border-color: #666;
       outline: none;
-      box-shadow: 0 0 0 3px rgba(225, 197, 113, 0.2);
+      box-shadow: 0 0 0 3px rgba(102, 102, 102, 0.1);
     }
 
     .items-section {
-      border: 2px solid #E1C571;
+      border: 2px solid #ddd;
       padding: 20px;
       border-radius: 8px;
-      margin-bottom: 20px;
+      margin-bottom: 25px;
+      background: #f8f9fa;
     }
 
     .items-section h3 {
-      color: #E1C571;
-      margin-bottom: 15px;
+      color: #333;
+      margin-bottom: 18px;
+      font-size: 18px;
+      text-align: center;
+      font-weight: 600;
     }
 
     .item-row {
       display: flex;
       gap: 10px;
-      margin-bottom: 10px;
-      align-items: end;
+      margin-bottom: 12px;
+      align-items: center;
     }
 
     .item-row input {
       flex: 1;
-      padding: 10px;
-      border: 1px solid #ddd;
+      padding: 12px;
+      border: 1px solid #ccc;
       border-radius: 6px;
-      font-size: 14px;
-      min-height: 40px;
+      font-size: 15px;
+      min-height: 46px;
       -webkit-appearance: none;
       appearance: none;
       box-sizing: border-box;
+      background: #fff;
     }
 
     .item-row .desc-input {
       flex: 2;
-      min-width: 120px;
+      min-width: 150px;
     }
 
     .item-row .qty-input,
     .item-row .price-input {
       flex: 1;
-      max-width: 90px;
-      min-width: 60px;
+      max-width: 100px;
+      min-width: 80px;
     }
 
     .item-row button {
       background: #dc3545;
       color: white;
       border: none;
-      padding: 10px 14px;
+      padding: 12px 16px;
       border-radius: 6px;
       cursor: pointer;
-      min-height: 40px;
-      min-width: 40px;
-      font-size: 16px;
+      min-height: 46px;
+      min-width: 46px;
+      font-size: 18px;
       font-weight: bold;
-      -webkit-tap-highlight-color: rgba(220, 53, 69, 0.3);
-      touch-action: manipulation;
-      user-select: none;
-      -webkit-user-select: none;
+      transition: all 0.2s;
+      -webkit-tap-highlight-color: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .item-row button:active {
+    .item-row button:hover {
       background: #c82333;
     }
 
+    .item-row button:active {
+      transform: scale(0.95);
+    }
+
     .add-item-btn {
-      background: #E1C571;
-      color: black;
+      background: #333;
+      color: white;
       border: none;
-      padding: 14px 20px;
-      border-radius: 6px;
+      padding: 16px 24px;
+      border-radius: 8px;
       cursor: pointer;
       font-weight: 600;
       width: 100%;
-      font-size: 16px;
-      min-height: 48px;
-      transition: background-color 0.2s ease;
-      -webkit-tap-highlight-color: rgba(225, 197, 113, 0.3);
-      touch-action: manipulation;
-      user-select: none;
-      -webkit-user-select: none;
+      font-size: 17px;
+      min-height: 52px;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+      -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
     }
 
-    .add-item-btn:hover,
+    .add-item-btn:hover {
+      background: #555;
+      transform: translateY(-1px);
+    }
+
     .add-item-btn:active {
-      background: #d4b560;
+      transform: translateY(0);
     }
 
     .action-buttons {
       display: flex;
-      gap: 12px;
+      gap: 15px;
       flex-direction: column;
+      margin-top: 25px;
     }
 
     .btn {
       flex: 1;
-      padding: 14px;
+      padding: 16px 20px;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
       font-weight: 600;
-      font-size: 16px;
-      min-height: 48px;
-      transition: all 0.2s ease;
-      -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
-      touch-action: manipulation;
-      user-select: none;
-      -webkit-user-select: none;
+      font-size: 17px;
+      min-height: 52px;
+      transition: all 0.3s ease;
+      -webkit-tap-highlight-color: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
     }
 
     .btn-primary {
-      background: #E1C571;
-      color: black;
-    }
-
-    .btn-primary:active {
-      background: #d4b560;
-    }
-
-    .btn-secondary {
-      background: #6c757d;
+      background: #333;
       color: white;
     }
 
+    .btn-primary:hover {
+      background: #555;
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: #0066cc;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #0052a3;
+      transform: translateY(-1px);
+    }
+
     .btn-secondary:active {
-      background: #5a6268;
+      transform: translateY(0);
     }
 
     /* INVOICE PREVIEW */
     .invoice-preview {
       flex: 1;
+      min-width: 0;
     }
 
     .page {
+      width: 100%;
       max-width: 900px;
       margin: 0 auto;
       background: #ffffff;
-      padding: 40px 50px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e0e0e0;
     }
 
     /* HEADER */
@@ -240,127 +273,163 @@
       justify-content: space-between;
       align-items: flex-start;
       margin-bottom: 30px;
-      border-bottom: 3px solid #E1C571;
-      padding-bottom: 15px;
+      border-bottom: 2px solid #333;
+      padding-bottom: 20px;
     }
 
     .brand-block {
-      max-width: 60%;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 20px;
     }
 
     .brand-logo {
-      width: 80px;
-      height: auto;
+      width: 90px;
+      height: 90px;
+      object-fit: contain;
+      border-radius: 8px;
+      padding: 5px;
+      background: #fff;
+    }
+
+    .brand-info {
+      flex: 1;
     }
 
     .brand-name {
-      font-size: 28px;
+      font-size: 32px;
       font-weight: 700;
-      letter-spacing: 1px;
-      margin-bottom: 4px;
+      color: #000000;
+      margin-bottom: 5px;
+      letter-spacing: 0.5px;
     }
 
     .brand-tagline {
-      font-size: 13px;
-      letter-spacing: 0.5px;
-      color: #333333;
-      margin-bottom: 8px;
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 10px;
+      font-style: italic;
     }
 
     .brand-contact {
-      font-size: 13px;
-      color: #333333;
-      line-height: 1.4;
+      font-size: 14px;
+      color: #333;
+      line-height: 1.6;
     }
 
     .brand-contact span {
       display: block;
+      margin-bottom: 3px;
     }
 
     .invoice-block {
       text-align: right;
-      font-size: 13px;
-      color: #000000;
+      padding-left: 20px;
+      border-left: 1px solid #eee;
     }
 
     .invoice-title {
-      font-size: 26px;
+      font-size: 28px;
       font-weight: 700;
+      color: #000;
+      margin-bottom: 20px;
       text-transform: uppercase;
-      margin-bottom: 8px;
+      letter-spacing: 1px;
     }
 
     /* PAID BADGE */
     .status-badge {
       display: none;
-      margin-top: 6px;
-      font-weight: 800;
-      font-size: 13px;
-      letter-spacing: 0.5px;
-      color: #1b5e20;
+      margin-top: 10px;
+      font-weight: 700;
+      font-size: 14px;
+      color: #28a745;
       text-transform: uppercase;
+      padding: 6px 16px;
+      background: #e8f5e9;
+      border-radius: 4px;
+      display: inline-block;
+      border: 1px solid #c3e6cb;
     }
 
     /* Receipt reference line */
     .receipt-ref {
       display: none;
-      margin-top: 10px;
-      font-size: 13px;
-      color: #000000;
+      margin: 20px 0;
+      font-size: 14px;
+      color: #000;
+      padding: 12px;
+      background: #f8f9fa;
+      border-radius: 6px;
+      border-left: 3px solid #333;
     }
 
     .meta-table {
-      margin-left: auto;
       border-collapse: collapse;
+      margin-top: 10px;
     }
 
     .meta-table td {
-      padding: 2px 0 2px 10px;
-      font-size: 13px;
+      padding: 6px 0 6px 15px;
+      font-size: 15px;
+      vertical-align: top;
     }
 
     .meta-label {
       font-weight: 600;
       text-align: right;
       white-space: nowrap;
+      color: #555;
+      padding-right: 10px;
     }
 
     /* TABLE */
     .table-wrapper {
-      margin-top: 8px;
+      margin-top: 25px;
+      overflow-x: auto;
+      border-radius: 6px;
+      border: 1px solid #e0e0e0;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 14px;
+      font-size: 15px;
+      background: #fff;
     }
 
     thead tr {
-      background: #E1C571;
-      color: #000000;
+      background: #333;
+      color: #ffffff;
     }
 
     thead th {
       text-transform: uppercase;
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 600;
-      padding: 10px 8px;
+      padding: 16px 15px;
       text-align: left;
-      border-bottom: 1px solid #dddddd;
+      border-bottom: none;
+      letter-spacing: 0.5px;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #eee;
+      transition: background-color 0.2s ease;
+    }
+
+    tbody tr:hover {
+      background: #f9f9f9;
     }
 
     tbody td {
-      padding: 10px 8px;
-      border-bottom: 1px solid #eeeeee;
+      padding: 16px 15px;
       vertical-align: top;
     }
 
     .col-desc {
       width: 50%;
+      font-weight: 500;
     }
 
     .col-qty {
@@ -378,297 +447,346 @@
     .amount {
       text-align: right;
       white-space: nowrap;
+      font-family: 'Courier New', monospace;
+      font-weight: 600;
+      color: #000;
     }
 
     /* SUMMARY */
     .summary-block {
-      max-width: 280px;
+      max-width: 300px;
       margin-left: auto;
-      margin-top: 18px;
+      margin-top: 30px;
       border-top: 2px solid #000000;
-      padding-top: 8px;
-      font-size: 14px;
+      padding-top: 15px;
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
     }
 
     .summary-row {
       display: flex;
       justify-content: space-between;
-      padding: 4px 0;
+      padding: 10px 0;
+      font-size: 16px;
     }
 
     .summary-label {
-      font-weight: 500;
+      font-weight: 600;
+      color: #333;
     }
 
     .summary-total {
-      margin-top: 6px;
-      padding-top: 6px;
-      border-top: 2px solid #E1C571;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 2px solid #333;
       font-weight: 700;
-      font-size: 15px;
+      font-size: 17px;
+      color: #000;
     }
 
     /* FOOTER */
     .footer {
-      margin-top: 35px;
-      font-size: 12px;
-      color: #333333;
-      border-top: 1px solid #dddddd;
-      padding-top: 10px;
-      text-align: right;
+      margin-top: 40px;
+      font-size: 14px;
+      color: #333;
+      border-top: 1px solid #ddd;
+      padding-top: 15px;
+      text-align: center;
+      font-style: italic;
     }
 
     .footer strong {
-      color: #000000;
+      color: #000;
+      font-size: 16px;
+      font-weight: 600;
     }
 
-    /* PRINT */
+    /* PRINT STYLES */
     @media print {
       @page {
-        size: 900px 1200px;
-        margin: 0;
-      }
-
-      * {
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-      }
-
-      html {
-        width: 900px !important;
-        height: auto !important;
+        size: A4;
+        margin: 20mm;
       }
 
       body {
-        background: #ffffff !important;
+        background: #fff !important;
         padding: 0 !important;
         margin: 0 !important;
-        width: 900px !important;
-      }
-
-      .page {
-        width: 900px !important;
-        height: auto !important;
-        margin: 0 auto !important;
-        padding: 40px 50px !important;
-        box-shadow: none !important;
-        border-radius: 0 !important;
-        page-break-inside: avoid !important;
-      }
-
-      .header {
-        border-bottom: 3px solid #E1C571 !important;
-        width: 100% !important;
-        margin-bottom: 30px !important;
-        padding-bottom: 15px !important;
-      }
-
-      .brand-logo {
-        width: 80px !important;
-        height: auto !important;
-      }
-
-      table {
-        width: 100% !important;
-        border-collapse: collapse !important;
-        font-size: 14px !important;
-      }
-
-      thead tr {
-        background: #E1C571 !important;
-        color: #000000 !important;
-      }
-
-      thead th {
-        background: #E1C571 !important;
-        color: #000000 !important;
-        padding: 10px 8px !important;
-      }
-
-      tbody td {
-        padding: 10px 8px !important;
-        border-bottom: 1px solid #eeeeee !important;
-      }
-
-      .summary-block {
-        max-width: 280px !important;
-        margin-left: auto !important;
-        margin-top: 18px !important;
-        border-top: 2px solid #000000 !important;
-        padding-top: 8px !important;
-      }
-
-      .summary-total {
-        border-top: 2px solid #E1C571 !important;
-        margin-top: 6px !important;
-        padding-top: 6px !important;
-      }
-
-      .footer {
-        margin-top: 35px !important;
-        border-top: 1px solid #dddddd !important;
-        padding-top: 10px !important;
-      }
-
-      .invoice-preview {
-        width: 900px !important;
-        margin: 0 auto !important;
+        font-size: 12pt !important;
+        line-height: 1.4 !important;
       }
 
       .container {
         display: block !important;
-        width: 900px !important;
-        margin: 0 auto !important;
-      }
-
-      body,
-      html {
-        overflow: visible !important;
-      }
-
-      body * {
-        overflow: visible !important;
-        transform: none !important;
-      }
-
-      .page * {
-        overflow: visible !important;
-        transform: none !important;
-      }
-
-      .page,
-      .page * {
-        box-shadow: none !important;
-        border-radius: 0 !important;
-      }
-
-      body {
-        position: static !important;
-      }
-
-      * {
-        position: static !important;
-      }
-
-      html,
-      body {
-        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
         margin: 0 !important;
-        overflow: visible !important;
-        transform: scale(1) !important;
-        zoom: 1 !important;
+        padding: 0 !important;
       }
 
       .input-panel {
         display: none !important;
-        visibility: hidden !important;
       }
 
-      .container {
-        display: block !important;
-        width: 900px !important;
-        margin: 0 auto !important;
+      .invoice-preview {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      .page {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        page-break-inside: avoid !important;
+        page-break-after: avoid !important;
+        border: none !important;
+      }
+
+      .header {
+        border-bottom: 2px solid #000 !important;
+        margin-bottom: 25px !important;
+        padding-bottom: 20px !important;
+      }
+
+      .brand-logo {
+        width: 80px !important;
+        height: 80px !important;
+        box-shadow: none !important;
+        border: none !important;
+      }
+
+      .brand-name {
+        color: #000 !important;
+        -webkit-text-fill-color: #000 !important;
+        background: none !important;
+      }
+
+      table {
+        page-break-inside: auto !important;
+      }
+
+      tr {
+        page-break-inside: avoid !important;
+        page-break-after: auto !important;
+      }
+
+      thead {
+        display: table-header-group !important;
+      }
+
+      thead tr {
+        background: #333 !important;
+        -webkit-print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
+
+      .summary-block {
+        page-break-inside: avoid !important;
+        background: #fff !important;
+        border: 1px solid #ddd !important;
+      }
+
+      .btn {
+        display: none !important;
       }
     }
 
-    /* Responsive Design */
+    /* RESPONSIVE DESIGN */
     @media (max-width: 1200px) {
       .container {
         flex-direction: column;
-        gap: 20px;
+        gap: 25px;
       }
 
       .input-panel {
         width: 100%;
         position: relative;
         top: 0;
-        max-width: 600px;
+        max-width: 700px;
         margin: 0 auto;
       }
-    }
 
-    /* iPad specific */
-    @media (min-width: 768px) and (max-width: 1024px) {
-      .container {
-        max-width: 100%;
-        padding: 0 20px;
-      }
-
-      .input-panel {
-        max-width: 700px;
+      .invoice-preview {
+        width: 100%;
       }
 
       .page {
-        max-width: 800px;
+        max-width: 100%;
       }
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 1024px) {
       body {
         padding: 15px;
       }
 
       .container {
-        gap: 15px;
+        gap: 20px;
       }
 
       .input-panel {
         padding: 20px;
-        border-radius: 6px;
+      }
+
+      .page {
+        padding: 30px;
+      }
+
+      .brand-name {
+        font-size: 28px;
+      }
+
+      .invoice-title {
+        font-size: 24px;
+      }
+
+      .brand-logo {
+        width: 80px;
+        height: 80px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 12px;
+      }
+
+      .input-panel {
+        padding: 18px;
+        border-radius: 10px;
       }
 
       .input-panel h2 {
         font-size: 22px;
-        margin-bottom: 15px;
+        margin-bottom: 20px;
+      }
+
+      .form-group {
+        margin-bottom: 18px;
+      }
+
+      .form-group input,
+      .form-group select {
+        padding: 12px;
+        min-height: 46px;
+        font-size: 16px;
+      }
+
+      .items-section {
+        padding: 16px;
+      }
+
+      .item-row {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+      }
+
+      .item-row input {
+        min-height: 44px;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+
+      .item-row button {
+        min-height: 44px;
+        width: 100%;
+        margin-top: 5px;
       }
 
       .page {
-        padding: 30px 25px;
-        border-radius: 6px;
+        padding: 25px;
+        border-radius: 10px;
       }
 
       .header {
         flex-direction: column;
-        gap: 15px;
+        gap: 20px;
         align-items: flex-start;
       }
 
       .brand-block {
-        max-width: 100%;
+        width: 100%;
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+      }
+
+      .brand-info {
+        text-align: center;
       }
 
       .invoice-block {
-        text-align: left;
-      }
-
-      .meta-table {
-        margin-left: 0;
+        text-align: center;
+        width: 100%;
+        padding-left: 0;
+        border-left: none;
+        border-top: 1px solid #eee;
+        padding-top: 20px;
       }
 
       .brand-logo {
-        width: 60px;
+        width: 70px;
+        height: 70px;
+        margin: 0 auto;
       }
 
       .brand-name {
         font-size: 24px;
       }
 
+      .brand-tagline,
+      .brand-contact {
+        text-align: center;
+      }
+
+      .meta-table {
+        width: 100%;
+      }
+
+      .meta-table td {
+        padding: 5px 0;
+        display: block;
+        width: 100%;
+        text-align: center;
+      }
+
+      .meta-label {
+        text-align: center;
+        font-weight: 700;
+      }
+
       table {
-        font-size: 13px;
+        font-size: 14px;
       }
 
       thead th {
-        padding: 8px 6px;
-        font-size: 11px;
+        padding: 14px 10px;
+        font-size: 12px;
       }
 
       tbody td {
-        padding: 8px 6px;
+        padding: 14px 10px;
       }
 
       .action-buttons {
-        flex-direction: row;
-        gap: 10px;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .btn {
+        min-height: 48px;
+        font-size: 16px;
+      }
+
+      .summary-block {
+        max-width: 100%;
+        margin-top: 25px;
       }
     }
 
@@ -679,6 +797,7 @@
 
       .input-panel {
         padding: 15px;
+        min-width: 0;
       }
 
       .form-group {
@@ -686,55 +805,99 @@
       }
 
       .items-section {
-        padding: 15px;
-      }
-
-      .item-row {
-        flex-direction: column;
-        gap: 5px;
-      }
-
-      .item-row input {
-        min-height: 44px;
-      }
-
-      .add-item-btn {
-        min-height: 44px;
-      }
-
-      .btn {
-        min-height: 44px;
+        padding: 12px;
       }
 
       .page {
-        padding: 20px 15px;
-      }
-
-      .header {
-        flex-direction: column;
-        gap: 10px;
-      }
-
-      .brand-block {
-        justify-content: center;
-        text-align: center;
-      }
-
-      .invoice-block {
-        text-align: center;
-      }
-
-      .meta-table {
-        margin: 0 auto;
-      }
-
-      .brand-logo {
-        width: 50px;
+        padding: 20px;
       }
 
       .brand-name {
-        font-size: 20px;
+        font-size: 22px;
       }
+
+      .invoice-title {
+        font-size: 20px;
+        margin-bottom: 10px;
+      }
+
+      .brand-logo {
+        width: 60px;
+        height: 60px;
+      }
+
+      table {
+        font-size: 13px;
+      }
+
+      thead th {
+        padding: 12px 8px;
+        font-size: 11px;
+      }
+
+      tbody td {
+        padding: 12px 8px;
+      }
+
+      .summary-row {
+        font-size: 14px;
+        padding: 8px 0;
+      }
+
+      .footer {
+        margin-top: 30px;
+        font-size: 13px;
+      }
+    }
+
+    /* Loading state */
+    .loading {
+      position: relative;
+      pointer-events: none;
+      opacity: 0.8;
+    }
+
+    .loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      margin: -10px 0 0 -10px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Clean section styles */
+    .clean-section {
+      background: #f8f9fa;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 25px;
+    }
+
+    .clean-section h3 {
+      color: #333;
+      margin-bottom: 15px;
+      font-size: 18px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .clean-section p {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 15px;
+      text-align: center;
     }
   </style>
 </head>
@@ -759,26 +922,40 @@
       <!-- Reference Number -->
       <div class="form-group">
         <label for="invoiceNumber">Reference Number</label>
-        <input type="text" id="invoiceNumber" value="000144" onchange="updateInvoice()">
+        <input type="text" id="invoiceNumber" value="000158" oninput="updateInvoice()">
       </div>
 
       <!-- Date -->
       <div class="form-group">
         <label for="invoiceDate">Date</label>
-        <input type="date" id="invoiceDate" value="2025-11-09" onchange="updateInvoice()">
+        <input type="date" id="invoiceDate" value="2025-12-29" oninput="updateInvoice()">
       </div>
 
-      <!-- Items Section -->
-      <div class="items-section">
-        <h3>Booking Items</h3>
-        <div id="itemsContainer"></div>
-        <button class="add-item-btn" onclick="addNewItem()">+ Add Item</button>
+      <!-- Booking Information Section -->
+      <div class="clean-section">
+        <h3>Booking Information</h3>
+        <div id="itemsContainer">
+          <div class="item-row">
+            <input type="text" class="desc-input" placeholder="Booking Description" 
+                   value="Booking Service" oninput="updateItem(0, 'description', this.value)">
+            <input type="number" class="qty-input" placeholder="Qty" 
+                   value="1" min="1" oninput="updateItem(0, 'quantity', this.value)">
+            <input type="number" class="price-input" placeholder="Price (LKR)" 
+                   value="20000" min="0" oninput="updateItem(0, 'unitPrice', this.value)">
+          </div>
+        </div>
+        <p>Add additional booking items if needed</p>
+        <button class="add-item-btn" onclick="addNewItem()">+ Add Another Item</button>
       </div>
 
-      <!-- Amount paid -->
-      <div class="form-group">
-        <label for="advancedPayment" id="amountPaidLabel">Advanced / Amount Paid (LKR)</label>
-        <input type="number" id="advancedPayment" value="42000" onchange="updateInvoice()">
+      <!-- Advanced Payment Section -->
+      <div class="clean-section">
+        <h3>Advanced Payment</h3>
+        <div class="form-group">
+          <label for="advancedPayment" id="amountPaidLabel">Advanced Payment (LKR)</label>
+          <input type="number" id="advancedPayment" value="15000" min="0" oninput="updateInvoice()">
+        </div>
+        <p>Enter the advance amount received</p>
       </div>
 
       <!-- Payment method + reference (shown for advance & receipt only) -->
@@ -793,13 +970,17 @@
 
       <div class="form-group" id="transactionRefGroup" style="display:none;">
         <label for="transactionRef">Transaction Reference</label>
-        <input type="text" id="transactionRef" placeholder="Bank slip / Ref No" onchange="updateInvoice()">
+        <input type="text" id="transactionRef" placeholder="Bank slip / Ref No" oninput="updateInvoice()">
       </div>
 
       <!-- Action Buttons -->
       <div class="action-buttons">
-        <button class="btn btn-primary" onclick="customPrint()">Print</button>
-        <button class="btn btn-secondary" onclick="downloadPDF()">Download PDF</button>
+        <button class="btn btn-primary" onclick="customPrint()">
+          <span>📄</span> Print Invoice
+        </button>
+        <button class="btn btn-secondary" onclick="downloadPDF()" id="pdfDownloadBtn">
+          <span>💾</span> Download PDF
+        </button>
       </div>
     </div>
 
@@ -809,31 +990,36 @@
         <!-- HEADER -->
         <div class="header">
           <div class="brand-block">
-            <img src="logo.png" alt="Sunset Escape Logo" class="brand-logo" />
-            <div>
+            <!-- Logo will be loaded here -->
+            <img src="logo.png" alt="Sunset Escape Logo" class="brand-logo" id="logoImage" 
+                 onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';">
+            <div id="logoFallback" class="brand-logo" style="display: none; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; background: #333;">
+              SE
+            </div>
+            <div class="brand-info">
               <div class="brand-name">Sunset Escape</div>
               <div class="brand-tagline">Beyond the ordinary, into luxury</div>
               <div class="brand-contact">
-                <span>+94 71 417 5072</span>
-                <span>Sunset Escape Homagama</span>
+                <span>📞 +94 71 417 5072</span>
+                <span>📍 Sunset Escape Homagama</span>
               </div>
             </div>
           </div>
 
           <div class="invoice-block">
             <div class="invoice-title" id="documentTitle">Invoice</div>
-
+            
             <!-- STATUS: PAID (Receipt mode) -->
             <div class="status-badge" id="paymentStatus">STATUS: PAID</div>
 
             <table class="meta-table">
               <tr>
                 <td class="meta-label" id="metaLabel">Invoice #</td>
-                <td id="displayInvoiceNumber">000144</td>
+                <td id="displayInvoiceNumber">000158</td>
               </tr>
               <tr>
                 <td class="meta-label">Date</td>
-                <td id="displayInvoiceDate">09 / 11 / 2025</td>
+                <td id="displayInvoiceDate">29 / 12 / 2025</td>
               </tr>
             </table>
           </div>
@@ -842,7 +1028,7 @@
         <!-- Receipt reference line (Receipt mode) -->
         <div class="receipt-ref" id="receiptRef">
           Received against Invoice No: <strong id="receiptInvoiceRef"></strong>
-          <span id="paymentMetaInline" style="display:block;margin-top:4px;"></span>
+          <span id="paymentMetaInline" style="display:block;margin-top:10px;font-size:14px;"></span>
         </div>
 
         <!-- BOOKING TABLE -->
@@ -852,11 +1038,18 @@
               <tr>
                 <th class="col-desc">Booking Details</th>
                 <th class="col-qty">Quantity</th>
-                <th class="col-unit">Unit Price</th>
-                <th class="col-total">Total</th>
+                <th class="col-unit">Unit Price (LKR)</th>
+                <th class="col-total">Total (LKR)</th>
               </tr>
             </thead>
-            <tbody id="invoiceItemsTable"></tbody>
+            <tbody id="invoiceItemsTable">
+              <tr>
+                <td class="col-desc">Booking Service</td>
+                <td class="col-qty">1</td>
+                <td class="col-unit amount">20,000</td>
+                <td class="col-total amount">20,000</td>
+              </tr>
+            </tbody>
           </table>
         </div>
 
@@ -864,15 +1057,15 @@
         <div class="summary-block">
           <div class="summary-row" id="summaryRow1">
             <span class="summary-label" id="summaryLabel1">Sub Total</span>
-            <span id="subTotal">0</span>
+            <span class="amount" id="subTotal">20,000</span>
           </div>
           <div class="summary-row" id="summaryRow2">
             <span class="summary-label" id="summaryLabel2">Advanced</span>
-            <span id="advancedAmount">0</span>
+            <span class="amount" id="advancedAmount">15,000</span>
           </div>
           <div class="summary-row summary-total" id="summaryRow3">
-            <span class="summary-label" id="summaryLabel3">Total</span>
-            <span id="totalAmount">0</span>
+            <span class="summary-label" id="summaryLabel3">Balance Payable</span>
+            <span class="amount" id="totalAmount">5,000</span>
           </div>
         </div>
 
@@ -888,56 +1081,90 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <script>
-    // Helper function to get today's date in YYYY-MM-DD format
-    function getTodayDate() {
-      const today = new Date();
-      const year = today.getFullYear();
-      const month = String(today.getMonth() + 1).padStart(2, '0');
-      const day = String(today.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    }
-
-    // Helper function to get the next invoice number from localStorage
-    function getNextInvoiceNumber() {
-      const STORAGE_KEY = 'sunsetEscapeLastInvoiceNumber';
-      let lastNumber = parseInt(localStorage.getItem(STORAGE_KEY) || '158', 10);
-      return String(lastNumber).padStart(6, '0');
-    }
-
-    // Helper function to save and increment the invoice number
-    function saveAndIncrementInvoiceNumber(currentNumber) {
-      const STORAGE_KEY = 'sunsetEscapeLastInvoiceNumber';
-      const numValue = parseInt(currentNumber, 10);
-      if (!isNaN(numValue)) {
-        localStorage.setItem(STORAGE_KEY, String(numValue + 1));
-      }
-    }
-
-    // Invoice data structure
+    // Initialize with sample data matching the PDF
     let invoiceData = {
-      documentType: 'invoice', // 'invoice' | 'advance' | 'proforma' | 'receipt'
-      invoiceNumber: getNextInvoiceNumber(),
-      date: getTodayDate(),
-      items: [],
-      advancedPayment: 0,
+      documentType: 'invoice',
+      invoiceNumber: '000158',
+      date: '2025-12-29',
+      items: [
+        { description: 'Booking Service', quantity: 1, unitPrice: 20000 }
+      ],
+      advancedPayment: 15000,
       paymentMethod: 'Bank Transfer',
       transactionRef: ''
     };
 
+    // Helper function to get today's date
+    function getTodayDate() {
+      const today = new Date();
+      return today.toISOString().split('T')[0];
+    }
+
+    // Helper to get next invoice number
+    function getNextInvoiceNumber() {
+      const STORAGE_KEY = 'sunsetEscapeLastInvoiceNumber';
+      let lastNumber = parseInt(localStorage.getItem(STORAGE_KEY) || '158', 10);
+      return String(lastNumber + 1).padStart(6, '0');
+    }
+
+    // Initialize form
     function initializeForm() {
+      // Set form values
       document.getElementById('documentType').value = invoiceData.documentType;
       document.getElementById('invoiceNumber').value = invoiceData.invoiceNumber;
       document.getElementById('invoiceDate').value = invoiceData.date;
-      document.getElementById('advancedPayment').value = invoiceData.advancedPayment || 0;
+      document.getElementById('advancedPayment').value = invoiceData.advancedPayment;
+      
+      // Update invoice
+      updateInvoice();
+      
+      // Set up auto-increment
+      setupAutoIncrement();
+      
+      // Load logo with error handling
+      loadLogo();
+    }
 
-      document.getElementById('paymentMethod').value = invoiceData.paymentMethod;
-      document.getElementById('transactionRef').value = invoiceData.transactionRef;
+    function loadLogo() {
+      const logoImg = document.getElementById('logoImage');
+      const logoFallback = document.getElementById('logoFallback');
+      
+      // Try to load logo
+      logoImg.onload = function() {
+        logoFallback.style.display = 'none';
+      };
+      
+      logoImg.onerror = function() {
+        this.style.display = 'none';
+        logoFallback.style.display = 'flex';
+      };
+    }
 
-      // Add input event listeners for real-time validation
-      document.getElementById('advancedPayment').addEventListener('input', function(e) {
-        if (e.target.value < 0) e.target.value = 0;
+    function setupAutoIncrement() {
+      const invoiceInput = document.getElementById('invoiceNumber');
+      invoiceInput.addEventListener('blur', function() {
+        const numValue = parseInt(this.value);
+        if (!isNaN(numValue)) {
+          localStorage.setItem('sunsetEscapeLastInvoiceNumber', numValue);
+        }
       });
+    }
 
+    function updateItem(index, field, value) {
+      if (field === 'quantity' || field === 'unitPrice') {
+        const numValue = parseFloat(value);
+        if (isNaN(numValue) || numValue < 0) {
+          value = field === 'quantity' ? 1 : 0;
+        } else {
+          value = numValue;
+        }
+      }
+      invoiceData.items[index][field] = value;
+      updateInvoice();
+    }
+
+    function addNewItem() {
+      invoiceData.items.push({ description: 'Additional Service', quantity: 1, unitPrice: 0 });
       renderItems();
       updateInvoice();
     }
@@ -950,56 +1177,46 @@
         const itemDiv = document.createElement('div');
         itemDiv.className = 'item-row';
         itemDiv.innerHTML = `
-          <input type="text" class="desc-input" placeholder="Description" value="${escapeHtml(item.description)}"
-                 onchange="updateItem(${index}, 'description', this.value)">
-          <input type="number" class="qty-input" placeholder="Qty" value="${item.quantity}" min="1"
-                 onchange="updateItem(${index}, 'quantity', parseFloat(this.value))">
-          <input type="number" class="price-input" placeholder="Price" value="${item.unitPrice}" min="0"
-                 onchange="updateItem(${index}, 'unitPrice', parseFloat(this.value))">
-          <button onclick="removeItem(${index})">×</button>
+          <input type="text" class="desc-input" placeholder="Booking Description" 
+                 value="${escapeHtml(item.description)}"
+                 oninput="updateItem(${index}, 'description', this.value)">
+          <input type="number" class="qty-input" placeholder="Qty" 
+                 value="${item.quantity}" min="1" step="1"
+                 oninput="updateItem(${index}, 'quantity', this.value)">
+          <input type="number" class="price-input" placeholder="Price (LKR)" 
+                 value="${item.unitPrice}" min="0" step="100"
+                 oninput="updateItem(${index}, 'unitPrice', this.value)">
+          ${invoiceData.items.length > 1 ? `<button onclick="removeItem(${index})" aria-label="Remove item">×</button>` : ''}
         `;
         container.appendChild(itemDiv);
       });
     }
 
+    function removeItem(index) {
+      if (invoiceData.items.length > 1) {
+        invoiceData.items.splice(index, 1);
+        renderItems();
+        updateInvoice();
+      } else {
+        alert('At least one item is required');
+      }
+    }
+
     function escapeHtml(str) {
       return (str ?? '').toString()
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;');
-    }
-
-    function updateItem(index, field, value) {
-      if (field === 'quantity' || field === 'unitPrice') {
-        // Validate numeric input
-        const numValue = parseFloat(value);
-        if (isNaN(numValue) || numValue < 0) {
-          value = 0;
-        } else {
-          value = numValue;
-        }
-      }
-      invoiceData.items[index][field] = value;
-      updateInvoice();
-    }
-
-    function addNewItem() {
-      invoiceData.items.push({ description: '', quantity: 1, unitPrice: 0 });
-      renderItems();
-      updateInvoice();
-    }
-
-    function removeItem(index) {
-      invoiceData.items.splice(index, 1);
-      renderItems();
-      updateInvoice();
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
     }
 
     function formatCurrency(amount) {
       if (isNaN(amount)) return '0';
-      return amount.toLocaleString();
+      return amount.toLocaleString('en-US', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      });
     }
 
     function formatDate(dateString) {
@@ -1012,78 +1229,74 @@
       return `${day} / ${month} / ${year}`;
     }
 
-    function getDocumentTitle(type) {
-      switch (type) {
-        case 'advance':
-          return 'Advance Payment Receipt';
-        case 'proforma':
-          return 'Proforma Invoice / Quotation';
-        case 'receipt':
-          return 'Payment Receipt';
-        default:
-          return 'Invoice';
-      }
-    }
-
-    function getMetaLabel(type) {
-      if (type === 'advance' || type === 'receipt') return 'Receipt #';
-      return 'Invoice #';
-    }
-
     function updateInvoice() {
-      // Read form values
+      // Update from form values
       invoiceData.documentType = document.getElementById('documentType').value;
-      invoiceData.invoiceNumber = document.getElementById('invoiceNumber').value;
+      invoiceData.invoiceNumber = document.getElementById('invoiceNumber').value.trim();
       invoiceData.date = document.getElementById('invoiceDate').value;
       invoiceData.advancedPayment = parseFloat(document.getElementById('advancedPayment').value) || 0;
-
       invoiceData.paymentMethod = document.getElementById('paymentMethod').value;
       invoiceData.transactionRef = document.getElementById('transactionRef').value;
 
-      // Update header title & labels
-      const docTitle = getDocumentTitle(invoiceData.documentType);
-      document.getElementById('documentTitle').textContent = docTitle;
-      document.getElementById('metaLabel').textContent = getMetaLabel(invoiceData.documentType);
+      // Update document title
+      const titles = {
+        'invoice': 'Invoice',
+        'advance': 'Advance Payment Receipt',
+        'proforma': 'Proforma Invoice',
+        'receipt': 'Payment Receipt'
+      };
+      document.getElementById('documentTitle').textContent = titles[invoiceData.documentType] || 'Invoice';
 
-      // Update date and number
-      document.getElementById('displayInvoiceNumber').textContent = invoiceData.invoiceNumber || '';
+      // Update meta label
+      const metaLabels = {
+        'invoice': 'Invoice #',
+        'advance': 'Receipt #',
+        'proforma': 'Reference #',
+        'receipt': 'Receipt #'
+      };
+      document.getElementById('metaLabel').textContent = metaLabels[invoiceData.documentType] || 'Invoice #';
+
+      // Update displayed values
+      document.getElementById('displayInvoiceNumber').textContent = invoiceData.invoiceNumber;
       document.getElementById('displayInvoiceDate').textContent = formatDate(invoiceData.date);
 
-      // Show/hide payment fields (advance + receipt only)
-      const showPaymentFields = (invoiceData.documentType === 'advance' || invoiceData.documentType === 'receipt');
+      // Show/hide payment fields
+      const showPaymentFields = invoiceData.documentType === 'advance' || invoiceData.documentType === 'receipt';
       document.getElementById('paymentMethodGroup').style.display = showPaymentFields ? 'block' : 'none';
       document.getElementById('transactionRefGroup').style.display = showPaymentFields ? 'block' : 'none';
 
-      // Amount label tweak
-      const amountPaidLabel = document.getElementById('amountPaidLabel');
-      if (invoiceData.documentType === 'invoice') amountPaidLabel.textContent = 'Advanced / Amount Paid (LKR)';
-      if (invoiceData.documentType === 'advance') amountPaidLabel.textContent = 'Advance Paid (LKR)';
-      if (invoiceData.documentType === 'proforma') amountPaidLabel.textContent = 'Advance / Amount Paid (LKR)';
-      if (invoiceData.documentType === 'receipt') amountPaidLabel.textContent = 'Amount Received (LKR)';
+      // Update amount label
+      const labelMap = {
+        'invoice': 'Advanced Payment (LKR)',
+        'advance': 'Advance Paid (LKR)',
+        'proforma': 'Advanced Payment (LKR)',
+        'receipt': 'Amount Received (LKR)'
+      };
+      document.getElementById('amountPaidLabel').textContent = labelMap[invoiceData.documentType] || 'Advanced Payment (LKR)';
 
-      // STATUS: PAID (Receipt only)
-      const paymentStatusEl = document.getElementById('paymentStatus');
-      paymentStatusEl.style.display = (invoiceData.documentType === 'receipt') ? 'block' : 'none';
+      // Update status badge
+      document.getElementById('paymentStatus').style.display = 
+        invoiceData.documentType === 'receipt' ? 'inline-block' : 'none';
 
-      // Receipt reference line (Receipt only)
+      // Update receipt reference
       const receiptRef = document.getElementById('receiptRef');
-      const receiptInvoiceRef = document.getElementById('receiptInvoiceRef');
-      const paymentMetaInline = document.getElementById('paymentMetaInline');
-
       if (invoiceData.documentType === 'receipt') {
         receiptRef.style.display = 'block';
-        receiptInvoiceRef.textContent = invoiceData.invoiceNumber || '';
-
+        document.getElementById('receiptInvoiceRef').textContent = invoiceData.invoiceNumber;
+        
         const parts = [];
-        if (invoiceData.paymentMethod) parts.push(`Method: <strong>${escapeHtml(invoiceData.paymentMethod)}</strong>`);
-        if (invoiceData.transactionRef) parts.push(`Ref: <strong>${escapeHtml(invoiceData.transactionRef)}</strong>`);
-        paymentMetaInline.innerHTML = parts.length ? parts.join(' &nbsp; | &nbsp; ') : '';
+        if (invoiceData.paymentMethod) {
+          parts.push(`Method: <strong>${escapeHtml(invoiceData.paymentMethod)}</strong>`);
+        }
+        if (invoiceData.transactionRef) {
+          parts.push(`Ref: <strong>${escapeHtml(invoiceData.transactionRef)}</strong>`);
+        }
+        document.getElementById('paymentMetaInline').innerHTML = parts.join(' &nbsp;|&nbsp; ');
       } else {
         receiptRef.style.display = 'none';
-        paymentMetaInline.innerHTML = '';
       }
 
-      // Update items table and subtotal
+      // Update items table
       const tableBody = document.getElementById('invoiceItemsTable');
       tableBody.innerHTML = '';
 
@@ -1104,233 +1317,245 @@
         tableBody.appendChild(row);
       });
 
-      // Summary elements
-      const row1 = document.getElementById('summaryRow1');
-      const row2 = document.getElementById('summaryRow2');
-      const row3 = document.getElementById('summaryRow3');
+      // Update summary
+      const advanced = invoiceData.advancedPayment;
+      let balance = subTotal - advanced;
+      
+      // Ensure balance is not negative
+      if (balance < 0) balance = 0;
 
+      // Update summary labels based on document type
       const label1 = document.getElementById('summaryLabel1');
       const label2 = document.getElementById('summaryLabel2');
       const label3 = document.getElementById('summaryLabel3');
+      const row2 = document.getElementById('summaryRow2');
+      const row3 = document.getElementById('summaryRow3');
 
-      const subTotalEl = document.getElementById('subTotal');
-      const advancedEl = document.getElementById('advancedAmount');
-      const totalEl = document.getElementById('totalAmount');
-
-      // Default: show all rows
-      row1.style.display = 'flex';
-      row2.style.display = 'flex';
-      row3.style.display = 'flex';
-
-      let totalAmount = subTotal - invoiceData.advancedPayment;
-
-      // Adjust labels and visibility per document type
-      if (invoiceData.documentType === 'invoice') {
-        label1.textContent = 'Sub Total';
-        label2.textContent = 'Advanced';
-        label3.textContent = 'Balance Payable';
-
-      } else if (invoiceData.documentType === 'advance') {
-        label1.textContent = 'Total Booking Value';
-        label2.textContent = 'Advance Paid';
-        label3.textContent = 'Balance Payable';
-
-      } else if (invoiceData.documentType === 'proforma') {
-        label1.textContent = 'Estimated Total';
-        row2.style.display = 'none';
-        row3.style.display = 'none';
-
-      } else if (invoiceData.documentType === 'receipt') {
-        label1.textContent = 'Invoice Total';
-        label2.textContent = 'Amount Received';
-        label3.textContent = 'Balance Due';
-
-        // Typically receipts are issued when paid-in-full; enforce sensible display
-        if (invoiceData.advancedPayment >= subTotal) {
-          totalAmount = 0;
-        }
+      switch(invoiceData.documentType) {
+        case 'invoice':
+          label1.textContent = 'Sub Total';
+          label2.textContent = 'Advanced';
+          label3.textContent = 'Balance Payable';
+          row2.style.display = 'flex';
+          row3.style.display = 'flex';
+          break;
+        case 'advance':
+          label1.textContent = 'Total Booking Value';
+          label2.textContent = 'Advance Paid';
+          label3.textContent = 'Balance Payable';
+          row2.style.display = 'flex';
+          row3.style.display = 'flex';
+          break;
+        case 'proforma':
+          label1.textContent = 'Estimated Total';
+          row2.style.display = 'none';
+          row3.style.display = 'none';
+          balance = subTotal; // Show full amount
+          break;
+        case 'receipt':
+          label1.textContent = 'Invoice Total';
+          label2.textContent = 'Amount Received';
+          label3.textContent = 'Balance Due';
+          row2.style.display = 'flex';
+          row3.style.display = 'flex';
+          break;
       }
 
-      // Update numeric values
-      subTotalEl.textContent = formatCurrency(subTotal);
-      advancedEl.textContent = formatCurrency(invoiceData.advancedPayment);
-      totalEl.textContent = formatCurrency(totalAmount < 0 ? 0 : totalAmount);
+      // Update amounts
+      document.getElementById('subTotal').textContent = formatCurrency(subTotal);
+      document.getElementById('advancedAmount').textContent = formatCurrency(advanced);
+      document.getElementById('totalAmount').textContent = formatCurrency(balance);
     }
 
     function customPrint() {
       const inputPanel = document.querySelector('.input-panel');
+      const originalDisplay = inputPanel.style.display;
       inputPanel.style.display = 'none';
-
-      document.body.style.width = '900px';
-      document.body.style.maxWidth = '900px';
-      document.body.style.minWidth = '900px';
-
-      window.print();
-
+      
+      // Set print styles
+      const originalBodyStyles = {
+        background: document.body.style.background,
+        padding: document.body.style.padding
+      };
+      
+      document.body.style.background = '#fff';
+      document.body.style.padding = '0';
+      
+      // Trigger print
       setTimeout(() => {
-        inputPanel.style.display = 'block';
-        document.body.style.width = '';
-        document.body.style.maxWidth = '';
-        document.body.style.minWidth = '';
+        window.print();
+        
+        // Restore styles
+        setTimeout(() => {
+          inputPanel.style.display = originalDisplay;
+          document.body.style.background = originalBodyStyles.background;
+          document.body.style.padding = originalBodyStyles.padding;
+        }, 500);
       }, 100);
     }
 
-    function getFileDocTypeName(type) {
-      switch (type) {
-        case 'advance':
-          return 'Advance_Receipt';
-        case 'proforma':
-          return 'Proforma_Invoice';
-        case 'receipt':
-          return 'Payment_Receipt';
-        default:
-          return 'Invoice';
-      }
-    }
-
-    function downloadPDF() {
-      const inputPanel = document.querySelector('.input-panel');
+    // FIXED PDF DOWNLOAD FUNCTION
+    async function downloadPDF() {
       const invoiceElement = document.querySelector('.page');
-      const logo = document.querySelector('.brand-logo');
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-      if (typeof html2pdf === 'undefined') {
-        customPrint();
-        return;
-      }
-
-      // Show loading state on mobile
-      if (isMobile) {
-        const btn = event ? event.target : null;
-        if (btn) {
-          btn.disabled = true;
-          btn.textContent = 'Generating...';
+      const inputPanel = document.querySelector('.input-panel');
+      const downloadBtn = document.getElementById('pdfDownloadBtn');
+      const originalBtnText = downloadBtn.textContent;
+      
+      // Show loading state
+      downloadBtn.classList.add('loading');
+      downloadBtn.disabled = true;
+      downloadBtn.textContent = 'Generating PDF...';
+      
+      try {
+        // Check if html2pdf is loaded
+        if (typeof html2pdf === 'undefined') {
+          throw new Error('PDF library not loaded');
         }
-      }
-
-      const originalBodyPadding = document.body.style.padding;
-      const originalContainerDisplay = document.querySelector('.container').style.display;
-
-      const originalStyles = {
-        margin: invoiceElement.style.margin,
-        boxShadow: invoiceElement.style.boxShadow,
-        borderRadius: invoiceElement.style.borderRadius,
-        width: invoiceElement.style.width,
-        maxWidth: invoiceElement.style.maxWidth,
-        padding: invoiceElement.style.padding
-      };
-
-      // Hide input panel and prepare invoice for capture
-      inputPanel.style.display = 'none';
-      document.body.style.padding = '0';
-      document.querySelector('.container').style.display = 'block';
-
-      invoiceElement.style.margin = '0 auto';
-      invoiceElement.style.boxShadow = 'none';
-      invoiceElement.style.borderRadius = '0';
-      invoiceElement.style.width = '210mm';
-      invoiceElement.style.maxWidth = '210mm';
-      invoiceElement.style.padding = '40px 50px';
-
-      const docTypeName = getFileDocTypeName(invoiceData.documentType);
-
-      const opt = {
-        margin: [0, 0, 0, 0],
-        filename: `Sunset_Escape_${docTypeName}_${invoiceData.invoiceNumber || new Date().getTime()}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: {
-          scale: 2,
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: '#ffffff',
-          logging: false,
-          scrollY: -window.scrollY,
-          scrollX: -window.scrollX,
-          windowWidth: 794,
-          windowHeight: 1123,
-          width: 794,
-          height: invoiceElement.scrollHeight
-        },
-        jsPDF: {
-          unit: 'mm',
-          format: 'a4',
-          orientation: 'portrait',
-          compress: true
-        },
-        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-      };
-
-      // Add small delay to ensure rendering is complete
-      setTimeout(() => {
-        html2pdf()
-          .set(opt)
-          .from(invoiceElement)
-          .save()
-          .then(() => {
-          // Save and auto-increment invoice number after successful PDF generation
-          saveAndIncrementInvoiceNumber(invoiceData.invoiceNumber);
-          
-          // Update to next invoice number for the next invoice
+        
+        // Hide input panel temporarily
+        inputPanel.style.display = 'none';
+        
+        // Store original styles
+        const originalStyles = {
+          bodyPadding: document.body.style.padding,
+          bodyBackground: document.body.style.background,
+          containerDisplay: document.querySelector('.container').style.display,
+          elementStyles: {
+            margin: invoiceElement.style.margin,
+            boxShadow: invoiceElement.style.boxShadow,
+            borderRadius: invoiceElement.style.borderRadius,
+            width: invoiceElement.style.width,
+            maxWidth: invoiceElement.style.maxWidth
+          }
+        };
+        
+        // Prepare for PDF capture
+        document.body.style.padding = '0';
+        document.body.style.background = '#fff';
+        document.querySelector('.container').style.display = 'block';
+        
+        invoiceElement.style.margin = '0 auto';
+        invoiceElement.style.boxShadow = 'none';
+        invoiceElement.style.borderRadius = '0';
+        invoiceElement.style.width = '210mm';
+        invoiceElement.style.maxWidth = '210mm';
+        
+        // Wait for any rendering to complete
+        await new Promise(resolve => setTimeout(resolve, 300));
+        
+        // Generate PDF filename
+        const docTypeMap = {
+          'invoice': 'Invoice',
+          'advance': 'Advance_Receipt',
+          'proforma': 'Proforma_Invoice',
+          'receipt': 'Payment_Receipt'
+        };
+        
+        const docTypeName = docTypeMap[invoiceData.documentType] || 'Invoice';
+        const fileName = `Sunset_Escape_${docTypeName}_${invoiceData.invoiceNumber}.pdf`;
+        
+        // Configure html2pdf with better settings
+        const opt = {
+          margin: [10, 10, 10, 10],
+          filename: fileName,
+          image: { 
+            type: 'jpeg', 
+            quality: 0.98,
+            cache: false
+          },
+          html2canvas: { 
+            scale: 2, // Reduced from 3 for better performance
+            useCORS: true,
+            logging: false,
+            backgroundColor: '#ffffff',
+            scrollX: 0,
+            scrollY: 0,
+            windowWidth: 794,
+            width: 794,
+            height: invoiceElement.scrollHeight + 50,
+            onclone: function(clonedDoc) {
+              // Ensure proper styling in cloned document
+              const logo = clonedDoc.getElementById('logoImage');
+              const fallback = clonedDoc.getElementById('logoFallback');
+              if (logo && logo.naturalWidth === 0) {
+                logo.style.display = 'none';
+                if (fallback) fallback.style.display = 'flex';
+              }
+              // Ensure black text is preserved
+              const brandName = clonedDoc.querySelector('.brand-name');
+              if (brandName) {
+                brandName.style.color = '#000000';
+                brandName.style.backgroundImage = 'none';
+                brandName.style.webkitBackgroundClip = 'unset';
+                brandName.style.webkitTextFillColor = '#000000';
+              }
+            }
+          },
+          jsPDF: {
+            unit: 'mm',
+            format: 'a4',
+            orientation: 'portrait',
+            compress: true
+          },
+          pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+        };
+        
+        // Generate PDF
+        await html2pdf().set(opt).from(invoiceElement).save();
+        
+        // Success - auto-increment invoice number
+        const currentNumber = parseInt(invoiceData.invoiceNumber) || 158;
+        if (!isNaN(currentNumber)) {
+          localStorage.setItem('sunsetEscapeLastInvoiceNumber', currentNumber);
           invoiceData.invoiceNumber = getNextInvoiceNumber();
           document.getElementById('invoiceNumber').value = invoiceData.invoiceNumber;
           updateInvoice();
-          
-          inputPanel.style.display = 'block';
-          document.body.style.padding = originalBodyPadding;
-            document.querySelector('.container').style.display = originalContainerDisplay;
-
-            invoiceElement.style.margin = originalStyles.margin;
-            invoiceElement.style.boxShadow = originalStyles.boxShadow;
-            invoiceElement.style.borderRadius = originalStyles.borderRadius;
-            invoiceElement.style.width = originalStyles.width;
-            invoiceElement.style.maxWidth = originalStyles.maxWidth;
-            invoiceElement.style.padding = originalStyles.padding;
-
-            // Reset button state on mobile
-            if (isMobile) {
-              const btn = event ? event.target : document.querySelector('.btn-secondary');
-              if (btn) {
-                btn.disabled = false;
-                btn.textContent = 'Download PDF';
-              }
-            }
-
-            // Show success message on mobile
-            if (isMobile && isIOS) {
-              alert('PDF generated successfully! Check your Files app or browser downloads.');
-            }
-          })
-          .catch(err => {
-            console.error('PDF generation error:', err);
-            inputPanel.style.display = 'block';
-            document.body.style.padding = originalBodyPadding;
-            document.querySelector('.container').style.display = originalContainerDisplay;
-
-            invoiceElement.style.margin = originalStyles.margin;
-            invoiceElement.style.boxShadow = originalStyles.boxShadow;
-            invoiceElement.style.borderRadius = originalStyles.borderRadius;
-            invoiceElement.style.width = originalStyles.width;
-            invoiceElement.style.maxWidth = originalStyles.maxWidth;
-            invoiceElement.style.padding = originalStyles.padding;
-
-            // Reset button state on mobile
-            if (isMobile) {
-              const btn = event ? event.target : document.querySelector('.btn-secondary');
-              if (btn) {
-                btn.disabled = false;
-                btn.textContent = 'Download PDF';
-              }
-              alert('PDF generation failed. Falling back to print...');
-            }
-
-            customPrint();
-          });
-      }, 100);
+        }
+        
+        // Show success message on mobile
+        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+          setTimeout(() => {
+            alert('PDF generated successfully! Check your downloads folder.');
+          }, 1000);
+        }
+        
+      } catch (error) {
+        console.error('PDF generation error:', error);
+        
+        // Fallback to print on error
+        alert('PDF generation failed. Using print as fallback...');
+        customPrint();
+        
+      } finally {
+        // Always restore everything
+        inputPanel.style.display = 'block';
+        document.body.style.padding = originalStyles?.bodyPadding || '';
+        document.body.style.background = originalStyles?.bodyBackground || '';
+        if (document.querySelector('.container')) {
+          document.querySelector('.container').style.display = originalStyles?.containerDisplay || '';
+        }
+        
+        // Restore element styles
+        if (originalStyles?.elementStyles && invoiceElement) {
+          invoiceElement.style.margin = originalStyles.elementStyles.margin;
+          invoiceElement.style.boxShadow = originalStyles.elementStyles.boxShadow;
+          invoiceElement.style.borderRadius = originalStyles.elementStyles.borderRadius;
+          invoiceElement.style.width = originalStyles.elementStyles.width;
+          invoiceElement.style.maxWidth = originalStyles.elementStyles.maxWidth;
+        }
+        
+        // Reset button
+        downloadBtn.classList.remove('loading');
+        downloadBtn.disabled = false;
+        downloadBtn.textContent = originalBtnText;
+      }
     }
 
+    // Initialize on load
     document.addEventListener('DOMContentLoaded', initializeForm);
+    
+    // Add initial render
+    setTimeout(renderItems, 100);
   </script>
 </body>
-
 </html>
