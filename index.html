@@ -393,7 +393,8 @@
           <div class="row2">
             <div>
               <label>Document #</label>
-              <input id="docNumber" placeholder="Auto" readonly />
+              <input id="docNumber" placeholder="Enter number (or auto)" />
+
             </div>
             <div>
               <label>Date</label>
@@ -688,7 +689,7 @@
       setMode(false);
 
       const type = docType.value;
-      docNumber.value = nextNumberForType(type);
+      docNumber.value = docNumber.value.trim() ? docNumber.value : nextNumberForType(type);
       docDate.value = todayISO();
 
       // defaults
@@ -728,9 +729,10 @@
       previewType.textContent = TYPE_LABEL[type];
 
       // Ensure number reflects type if user changes type mid-edit
-      if (!editingId){
-        docNumber.value = nextNumberForType(type);
-      }
+      if (!editingId && !docNumber.value.trim()){
+  docNumber.value = nextNumberForType(type);
+}
+
     }
 
     function addItem(){
@@ -928,9 +930,7 @@
       const showTotals = doc.type !== "RECEIPT";
 
       const col1 = (doc.type === "RECEIPT") ? "DESCRIPTION" : "BOOKING DETAILS";
-      const refText = (doc.type === "RECEIPT")
-        ? `For Invoice # ${doc.forInvoiceNumber || "[Optional]"}`
-        : (doc.reference || "[Optional]");
+      
 
       const validUntilRow = (doc.type === "QUOTATION" && doc.validUntilISO)
         ? `<div class="metaRow"><div class="k">Valid Until</div><div class="v">${formatDateDDMMYYYY(doc.validUntilISO)}</div></div>`
@@ -1019,10 +1019,10 @@
           <div class="dividerGold"></div>
 
           <div class="guestLine">
-            <div><strong>Customer:</strong> ${escapeHtml(doc.customerName || "")}</div>
-            <div><strong>Phone:</strong> ${escapeHtml(doc.customerPhone || "")}</div>
-            <div><strong>Reference:</strong> ${escapeHtml(refText)}</div>
-          </div>
+  <div><strong>Customer:</strong> ${escapeHtml(doc.customerName || "")}</div>
+  <div><strong>Phone:</strong> ${escapeHtml(doc.customerPhone || "")}</div>
+</div>
+
 
           <table class="docTable">
             <thead>
