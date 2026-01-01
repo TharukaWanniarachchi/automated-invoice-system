@@ -6,7 +6,8 @@
   <title>Sunset Escape - Billing System</title>
 
   <!-- PDF library (client-side) -->
-<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+
 
           integrity="sha512-GsLlZN/3F2YjJ0v2wG3cK5JZV1L8mukwLQ4nV8yN1bDkqk+9E7p2hB3oHkC6v7d9VwzvD9+u5p7nF1Jx8qQq5A=="
           crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -171,13 +172,15 @@
     /* ====== Rendered Document Template (A4) ====== */
     @page { size: A4; margin: 14mm; }
     .pageA4{
-      width: 210mm;
-      min-height: 297mm;
-      background:#fff;
-      padding: 18mm 16mm;
-      margin: 0 auto;
-      color:#111;
-    }
+  width: 210mm;
+  height: 297mm;          /* FORCE single-page A4 height */
+  background:#fff;
+  padding: 12mm 14mm;     /* smaller padding = no big top blank */
+  margin: 0;
+  color:#111;
+  display: flex;
+  flex-direction: column;
+}
     .docHeader{
       display:flex;
       justify-content: space-between;
@@ -310,22 +313,25 @@
     .receiptInfo .rv{ font-weight: 700; }
 
     .docFooter{
-      margin-top: 70px;
-      border-top: 1px solid #e6e6e6;
-      padding-top: 18px;
-      display:flex;
-      justify-content: flex-end;
-      font-weight: 800;
-      color:#111;
-    }
+  margin-top: auto;       /* pushes footer to bottom */
+  border-top: 1px solid #e6e6e6;
+  padding-top: 18px;
+  display:flex;
+  justify-content: flex-end;
+  font-weight: 800;
+  color:#111;
+}
 
-    .hiddenRender{
-      position: fixed;
-      left: -99999px;
-      top: 0;
-      width: 210mm;
-      background: #fff;
-    }
+   .hiddenRender{
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 210mm;
+  background: #fff;
+  visibility: hidden;   /* keep hidden, but NOT offscreen */
+  z-index: -1;
+}
+
 
     /* History list */
     .historyList{ display:flex; flex-direction: column; gap: 8px; }
@@ -1048,28 +1054,55 @@
     }
 
     async function downloadPDFForCurrent(){
-      const doc = getFormDoc();
-      const err = validateDoc(doc);
-      if (err) { alert(err); return; }
+  const doc = getFormDoc();
+  const err = validateDoc(doc);
+  if (err) { alert(err); return; }
 
-      // render into pdf mount (not scaled)
-      pdfMount.innerHTML = renderDocHTML(doc);
+  // render into mount (hidden but in normal flow)
+  pdfMount.innerHTML = renderDocHTML(doc);
 
-      const filename = `${doc.type}-${doc.number}.pdf`;
-      const opt = {
-        margin: 0,
-        filename,
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
-      };
+  // TEMP show for accurate size calculation
+  pdfMount.style.visibility = "visible";
 
-      try{
-        await html2pdf().set(opt).from(pdfMount.firstElementChild).save();
-      } finally {
-        pdfMount.innerHTML = "";
-      }
+  const filename = `${doc.type}-${doc.number}.pdf`;
+  const element = pdfMount.firstElementChild;
+
+  const opt = {
+    margin: [0, 0, 0, 0],
+    filename,
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: {
+      scale: 3,
+      backgroundColor: "#ffffff",
+      useCORS: true,
+      scrollX: 0,
+      scrollY: 0,
+      windowWidth: element.scrollWidth,
+      windowHeight: element.scrollHeight
+    },
+    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+    pagebreak: { mode: ["avoid-all", "css", "legacy"] }
+  };
+
+  try {
+    // Desktop: save directly
+    // iPhone/iPad Safari: open in new tab (most reliable)
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+    if (isIOS || isSafari) {
+      const worker = html2pdf().set(opt).from(element).toPdf();
+      const pdf = await worker.get("pdf");
+      const blobUrl = pdf.output("bloburl");
+      window.open(blobUrl, "_blank");
+    } else {
+      await html2pdf().set(opt).from(element).save();
     }
+  } finally {
+    pdfMount.style.visibility = "hidden";
+    pdfMount.innerHTML = "";
+  }
+}
 
     /***********************
      * History Rendering   *
