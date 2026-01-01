@@ -7,7 +7,10 @@
 
   <!-- PDF library (client-side) -->
 <!-- PDF library (client-side) -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+
 
 
   <style>
@@ -1097,11 +1100,10 @@
     pdf.save(filename);
 
   } catch (e) {
-    console.error("PDF ERROR:", e);
-    alert("PDF generation failed. Open Console (F12) and check 'PDF ERROR'.");
-  } finally {
-    pdfMount.innerHTML = "";
-  }
+  console.error("PDF ERROR:", e);
+  alert("PDF generation failed: " + (e && e.message ? e.message : e));
+}
+
 }
 
 
