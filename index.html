@@ -6,12 +6,9 @@
   <title>Sunset Escape - Billing System</title>
 
   <!-- PDF library (client-side) -->
-  <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+<!-- PDF library (client-side) -->
+<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
 
-
-
-          integrity="sha512-GsLlZN/3F2YjJ0v2wG3cK5JZV1L8mukwLQ4nV8yN1bDkqk+9E7p2hB3oHkC6v7d9VwzvD9+u5p7nF1Jx8qQq5A=="
-          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <style>
     :root{
@@ -1059,51 +1056,40 @@
   const err = validateDoc(doc);
   if (err) { alert(err); return; }
 
-  // Render clean A4 into mount
   pdfMount.innerHTML = renderDocHTML(doc);
-
   const element = pdfMount.firstElementChild;
   const filename = `${doc.type}-${doc.number}.pdf`;
 
-  // IMPORTANT: ensure no scaling/preview transforms affect capture
-  element.style.transform = "none";
-  element.style.margin = "0";
-
   try {
-    // html2pdf bundle exposes html2canvas + jsPDF internally
+    // 1) Capture template as image
     const canvas = await html2canvas(element, {
       scale: 3,
       backgroundColor: "#ffffff",
       useCORS: true,
+      allowTaint: true,
       scrollX: 0,
-      scrollY: 0,
-      windowWidth: element.scrollWidth,
-      windowHeight: element.scrollHeight
+      scrollY: 0
     });
 
     const imgData = canvas.toDataURL("image/jpeg", 0.98);
 
-    // jsPDF from html2pdf bundle:
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF("p", "mm", "a4");
+    // 2) Create ONE A4 page and fit image into it (never adds page 2)
+    const jsPDFRef = (window.jspdf && window.jspdf.jsPDF) ? window.jspdf.jsPDF : (window.jsPDF ? window.jsPDF : null);
+    if (!jsPDFRef) throw new Error("jsPDF not found. html2pdf bundle not loaded.");
 
-    const pageW = pdf.internal.pageSize.getWidth();   // 210mm
-    const pageH = pdf.internal.pageSize.getHeight();  // 297mm
+    const pdf = new jsPDFRef("p", "mm", "a4");
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
 
-    // Convert canvas px -> mm scaling to fit ONE page
-    const imgW = pageW;
-    const imgH = (canvas.height * imgW) / canvas.width;
+    // Fit image to A4 while maintaining aspect ratio
+    let finalW = pageW;
+    let finalH = (canvas.height * finalW) / canvas.width;
 
-    let finalW = imgW;
-    let finalH = imgH;
-
-    // If height exceeds A4, scale down to fit height
     if (finalH > pageH) {
       finalH = pageH;
       finalW = (canvas.width * finalH) / canvas.height;
     }
 
-    // Center horizontally (no blank top)
     const x = (pageW - finalW) / 2;
     const y = 0;
 
@@ -1111,80 +1097,115 @@
     pdf.save(filename);
 
   } catch (e) {
-    console.error(e);
-    alert("PDF generation failed. Check console for details.");
+    console.error("PDF ERROR:", e);
+    alert("PDF generation failed. Open Console (F12) and check 'PDF ERROR'.");
   } finally {
     pdfMount.innerHTML = "";
   }
 }
 
 
+
     /***********************
      * History Rendering   *
      ***********************/
     function renderHistory(){
+  const docs = loadDocs();
+  countLabel.textContent = `${docs.length} saved document(s)`;
+  historyList.innerHTML = "";
+
+  if (docs.length === 0){
+    historyList.innerHTML = `<div class="hint">No saved documents yet.</div>`;
+    return;
+  }
+
+  docs.slice(0, 50).forEach(d => {
+    const subtotal = sumItems(d.items || []);
+    const total = (d.type === "RECEIPT")
+      ? Number(d.receiptAmount || 0)
+      : (subtotal - Number(d.advanced || 0));
+
+    const card = document.createElement("div");
+    card.className = "histItem";
+
+    const title = `${TYPE_LABEL[d.type]} #${d.number}`;
+    const meta = `${formatDateDDMMYYYY(d.dateISO)} • ${d.customerName} • ${d.currency || "LKR"} ${money(total)}`;
+
+    card.innerHTML = `
+      <div>
+        <div class="hTitle">${escapeHtml(title)}</div>
+        <div class="hMeta">${escapeHtml(meta)}</div>
+      </div>
+      <div class="histBtns">
+        <button class="miniBtn" data-open="${d.id}">Open</button>
+        <button class="miniBtn" data-pdf="${d.id}">PDF</button>
+      </div>
+    `;
+    historyList.appendChild(card);
+  });
+
+  // OPEN buttons
+  historyList.querySelectorAll("button[data-open]").forEach(b => {
+    b.addEventListener("click", () => loadForEdit(b.dataset.open));
+  });
+
+  // PDF buttons (FORCE 1 PAGE)
+  historyList.querySelectorAll("button[data-pdf]").forEach(b => {
+    b.addEventListener("click", async () => {
       const docs = loadDocs();
-      countLabel.textContent = `${docs.length} saved document(s)`;
-      historyList.innerHTML = "";
+      const d = docs.find(x => x.id === b.dataset.pdf);
+      if (!d) return;
 
-      if (docs.length === 0){
-        historyList.innerHTML = `<div class="hint">No saved documents yet.</div>`;
-        return;
-      }
+      pdfMount.innerHTML = renderDocHTML(d);
+      const element = pdfMount.firstElementChild;
+      const filename = `${d.type}-${d.number}.pdf`;
 
-      docs.slice(0, 50).forEach(d => {
-        const subtotal = sumItems(d.items || []);
-        const total = (d.type === "RECEIPT")
-          ? Number(d.receiptAmount || 0)
-          : (subtotal - Number(d.advanced || 0));
-
-        const card = document.createElement("div");
-        card.className = "histItem";
-
-        const title = `${TYPE_LABEL[d.type]} #${d.number}`;
-        const meta = `${formatDateDDMMYYYY(d.dateISO)} • ${d.customerName} • ${d.currency || "LKR"} ${money(total)}`;
-
-        card.innerHTML = `
-          <div>
-            <div class="hTitle">${escapeHtml(title)}</div>
-            <div class="hMeta">${escapeHtml(meta)}</div>
-          </div>
-          <div class="histBtns">
-            <button class="miniBtn" data-open="${d.id}">Open</button>
-            <button class="miniBtn" data-pdf="${d.id}">PDF</button>
-          </div>
-        `;
-        historyList.appendChild(card);
-      });
-
-      historyList.querySelectorAll("button[data-open]").forEach(b => {
-        b.addEventListener("click", () => loadForEdit(b.dataset.open));
-      });
-
-      historyList.querySelectorAll("button[data-pdf]").forEach(b => {
-        b.addEventListener("click", async () => {
-          const docs = loadDocs();
-          const d = docs.find(x => x.id === b.dataset.pdf);
-          if (!d) return;
-
-          // render & download
-          pdfMount.innerHTML = renderDocHTML(d);
-          const filename = `${d.type}-${d.number}.pdf`;
-          const opt = {
-            margin: 0,
-            filename,
-            image: { type: "jpeg", quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true },
-            jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
-          };
-          try{
-            await html2pdf().set(opt).from(pdfMount.firstElementChild).save();
-          } finally {
-            pdfMount.innerHTML = "";
-          }
+      try {
+        const canvas = await html2canvas(element, {
+          scale: 3,
+          backgroundColor: "#ffffff",
+          useCORS: true,
+          allowTaint: true,
+          scrollX: 0,
+          scrollY: 0
         });
-      });
-    }
+
+        const imgData = canvas.toDataURL("image/jpeg", 0.98);
+
+        const jsPDFRef =
+          (window.jspdf && window.jspdf.jsPDF) ? window.jspdf.jsPDF :
+          (window.jsPDF ? window.jsPDF : null);
+
+        if (!jsPDFRef) throw new Error("jsPDF not found. html2pdf bundle not loaded.");
+
+        const pdf = new jsPDFRef("p", "mm", "a4");
+        const pageW = pdf.internal.pageSize.getWidth();
+        const pageH = pdf.internal.pageSize.getHeight();
+
+        let finalW = pageW;
+        let finalH = (canvas.height * finalW) / canvas.width;
+
+        if (finalH > pageH) {
+          finalH = pageH;
+          finalW = (canvas.width * finalH) / canvas.height;
+        }
+
+        const x = (pageW - finalW) / 2;
+        const y = 0;
+
+        pdf.addImage(imgData, "JPEG", x, y, finalW, finalH);
+        pdf.save(filename);
+
+      } catch (e) {
+        console.error("PDF ERROR:", e);
+        alert("PDF generation failed. Open Console (F12) and check 'PDF ERROR'.");
+      } finally {
+        pdfMount.innerHTML = "";
+      }
+    });
+  });
+}
+
 
     /***********************
      * Safety: HTML escape *
