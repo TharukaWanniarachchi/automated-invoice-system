@@ -329,9 +329,11 @@
   top: 0;
   width: 210mm;
   background: #fff;
-  visibility: hidden;   /* keep hidden, but NOT offscreen */
+  opacity: 0;          /* instead of visibility:hidden */
+  pointer-events: none;
   z-index: -1;
 }
+
 
 
     /* History list */
