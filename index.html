@@ -1,1561 +1,1183 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="format-detection" content="telephone=no">
-  <title>Sunset Escape - Invoice Generator</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Sunset Escape - Billing System</title>
+
+  <!-- PDF library (client-side) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+          integrity="sha512-GsLlZN/3F2YjJ0v2wG3cK5JZV1L8mukwLQ4nV8yN1bDkqk+9E7p2hB3oHkC6v7d9VwzvD9+u5p7nF1Jx8qQq5A=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    :root{
+      --gold:#d9bf73;
+      --text:#111;
+      --muted:#444;
+      --line:#ececec;
+      --bg:#f3f4f6;
+      --card:#ffffff;
     }
-
-    body {
-      background: #f5f7fa;
-      padding: 20px;
-      padding-top: max(20px, env(safe-area-inset-top));
-      padding-bottom: max(20px, env(safe-area-inset-bottom));
-      padding-left: max(20px, env(safe-area-inset-left));
-      padding-right: max(20px, env(safe-area-inset-right));
-      color: #000000;
-      min-height: 100vh;
-      -webkit-text-size-adjust: 100%;
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
     }
-
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
-      display: flex;
-      gap: 30px;
+    .app{
+      max-width: 1100px;
+      margin: 18px auto;
+      padding: 0 14px 28px;
     }
-
-    /* INPUT PANEL */
-    .input-panel {
-      width: 400px;
-      background: #ffffff;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-      height: fit-content;
-      position: sticky;
-      top: 20px;
-      min-width: 350px;
-      border: 1px solid #e0e0e0;
-    }
-
-    .input-panel h2 {
-      color: #333;
-      margin-bottom: 25px;
-      font-size: 26px;
-      border-bottom: 2px solid #333;
-      padding-bottom: 12px;
-      text-align: center;
-      font-weight: 600;
-    }
-
-    .form-group {
-      margin-bottom: 22px;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      color: #2c3e50;
-      font-size: 15px;
-    }
-
-    .form-group input,
-    .form-group textarea,
-    .form-group select {
-      width: 100%;
-      padding: 14px 16px;
-      border: 2px solid #ddd;
-      border-radius: 8px;
-      font-size: 16px;
-      -webkit-appearance: none;
-      appearance: none;
-      min-height: 50px;
-      box-sizing: border-box;
-      background: #ffffff;
-      transition: all 0.3s ease;
-      -webkit-tap-highlight-color: transparent;
-      color: #333;
-    }
-
-    .form-group input:focus,
-    .form-group textarea:focus,
-    .form-group select:focus {
-      border-color: #666;
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(102, 102, 102, 0.1);
-    }
-
-    .items-section {
-      border: 2px solid #ddd;
-      padding: 20px;
-      border-radius: 8px;
-      margin-bottom: 25px;
-      background: #f8f9fa;
-    }
-
-    .items-section h3 {
-      color: #333;
-      margin-bottom: 18px;
-      font-size: 18px;
-      text-align: center;
-      font-weight: 600;
-    }
-
-    .item-row {
-      display: flex;
-      gap: 10px;
+    .top{
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      gap: 12px;
       margin-bottom: 12px;
-      align-items: center;
+    }
+    .brand{
+      display:flex; gap:10px; align-items:center;
+    }
+    .brand img{
+      width:44px;height:44px;object-fit:contain;background:#fff;border-radius:10px;border:1px solid #e5e7eb;
+    }
+    .brand .t1{ font-weight:900; font-size:18px; line-height:1; }
+    .brand .t2{ font-size:12px; color:#555; margin-top:2px; }
+    .pillbar{
+      display:flex; gap:8px; flex-wrap:wrap;
+      align-items:center;
+    }
+    .pill{
+      border:1px solid #e5e7eb;
+      background:#fff;
+      padding:8px 10px;
+      border-radius: 999px;
+      font-size:12.5px;
+      color:#222;
     }
 
-    .item-row input {
-      flex: 1;
-      padding: 12px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 15px;
-      min-height: 46px;
-      -webkit-appearance: none;
-      appearance: none;
-      box-sizing: border-box;
-      background: #fff;
+    .grid{
+      display:grid;
+      grid-template-columns: 420px 1fr;
+      gap: 14px;
     }
 
-    .item-row .desc-input {
-      flex: 2;
-      min-width: 150px;
+    .card{
+      background: var(--card);
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      box-shadow: 0 10px 24px rgba(0,0,0,.06);
+      overflow:hidden;
     }
-
-    .item-row .qty-input,
-    .item-row .price-input {
-      flex: 1;
-      max-width: 100px;
-      min-width: 80px;
-    }
-
-    .item-row button {
-      background: #dc3545;
-      color: white;
-      border: none;
-      padding: 12px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      min-height: 46px;
-      min-width: 46px;
-      font-size: 18px;
-      font-weight: bold;
-      transition: all 0.2s;
-      -webkit-tap-highlight-color: transparent;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .item-row button:hover {
-      background: #c82333;
-    }
-
-    .item-row button:active {
-      transform: scale(0.95);
-    }
-
-    .add-item-btn {
-      background: #333;
-      color: white;
-      border: none;
-      padding: 16px 24px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      width: 100%;
-      font-size: 17px;
-      min-height: 52px;
-      transition: all 0.3s ease;
-      margin-top: 10px;
-      -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
-    }
-
-    .add-item-btn:hover {
-      background: #555;
-      transform: translateY(-1px);
-    }
-
-    .add-item-btn:active {
-      transform: translateY(0);
-    }
-
-    .action-buttons {
-      display: flex;
-      gap: 15px;
-      flex-direction: column;
-      margin-top: 25px;
-    }
-
-    .btn {
-      flex: 1;
-      padding: 16px 20px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 17px;
-      min-height: 52px;
-      transition: all 0.3s ease;
-      -webkit-tap-highlight-color: transparent;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .cardHeader{
+      padding: 12px 14px;
+      border-bottom: 1px solid #e5e7eb;
+      background: linear-gradient(180deg, #fff, #fafafa);
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
       gap: 10px;
     }
-
-    .btn-primary {
-      background: #333;
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background: #555;
-      transform: translateY(-1px);
-    }
-
-    .btn-primary:active {
-      transform: translateY(0);
-    }
-
-    .btn-secondary {
-      background: #0066cc;
-      color: white;
-    }
-
-    .btn-secondary:hover {
-      background: #0052a3;
-      transform: translateY(-1px);
-    }
-
-    .btn-secondary:active {
-      transform: translateY(0);
-    }
-
-    /* INVOICE PREVIEW */
-    .invoice-preview {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .page {
-      width: 100%;
-      max-width: 900px;
-      margin: 0 auto;
-      background: #ffffff;
-      padding: 40px;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-      border: 1px solid #e0e0e0;
-    }
-
-    /* HEADER */
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 30px;
-      border-bottom: 2px solid #333;
-      padding-bottom: 20px;
-    }
-
-    .brand-block {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .brand-logo {
-      width: 90px;
-      height: 90px;
-      object-fit: contain;
-      border-radius: 8px;
-      padding: 5px;
-      background: #fff;
-    }
-
-    .brand-info {
-      flex: 1;
-    }
-
-    .brand-name {
-      font-size: 32px;
-      font-weight: 700;
-      color: #000000;
-      margin-bottom: 5px;
-      letter-spacing: 0.5px;
-    }
-
-    .brand-tagline {
+    .cardHeader h2{
       font-size: 14px;
-      color: #666;
-      margin-bottom: 10px;
-      font-style: italic;
+      margin:0;
+      font-weight: 900;
+      letter-spacing: .2px;
     }
+    .cardBody{ padding: 12px 14px 14px; }
 
-    .brand-contact {
-      font-size: 14px;
-      color: #333;
-      line-height: 1.6;
+    label{ display:block; font-size:12px; color:#333; font-weight:800; margin: 10px 0 6px; }
+    input, select, textarea{
+      width:100%;
+      padding: 10px 10px;
+      border:1px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 13.5px;
+      outline:none;
+      background:#fff;
     }
-
-    .brand-contact span {
-      display: block;
-      margin-bottom: 3px;
-    }
-
-    .invoice-block {
-      text-align: right;
-      padding-left: 20px;
-      border-left: 1px solid #eee;
-    }
-
-    .invoice-title {
-      font-size: 28px;
-      font-weight: 700;
-      color: #000;
-      margin-bottom: 20px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    /* PAID BADGE */
-    .status-badge {
-      display: none;
-      margin-top: 10px;
-      font-weight: 700;
-      font-size: 14px;
-      color: #28a745;
-      text-transform: uppercase;
-      padding: 6px 16px;
-      background: #e8f5e9;
-      border-radius: 4px;
-      display: inline-block;
-      border: 1px solid #c3e6cb;
-    }
-
-    /* Receipt reference line */
-    .receipt-ref {
-      display: none;
-      margin: 20px 0;
-      font-size: 14px;
-      color: #000;
-      padding: 12px;
-      background: #f8f9fa;
-      border-radius: 6px;
-      border-left: 3px solid #333;
-    }
-
-    .meta-table {
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-
-    .meta-table td {
-      padding: 6px 0 6px 15px;
-      font-size: 15px;
-      vertical-align: top;
-    }
-
-    .meta-label {
-      font-weight: 600;
-      text-align: right;
-      white-space: nowrap;
-      color: #555;
-      padding-right: 10px;
-    }
-
-    /* TABLE */
-    .table-wrapper {
-      margin-top: 25px;
-      overflow-x: auto;
-      border-radius: 6px;
-      border: 1px solid #e0e0e0;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 15px;
-      background: #fff;
-    }
-
-    thead tr {
-      background: #333;
-      color: #ffffff;
-    }
-
-    thead th {
-      text-transform: uppercase;
+    textarea{ min-height: 64px; resize: vertical; }
+    .row2{ display:grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .row3{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    .btnRow{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 12px; }
+    button{
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #111;
+      background: #111;
+      color:#fff;
+      font-weight:900;
       font-size: 13px;
-      font-weight: 600;
-      padding: 16px 15px;
-      text-align: left;
-      border-bottom: none;
-      letter-spacing: 0.5px;
+      cursor:pointer;
+    }
+    button.secondary{
+      background:#fff;
+      color:#111;
+    }
+    button.danger{
+      background:#b91c1c;
+      border-color:#b91c1c;
+    }
+    button:disabled{
+      opacity:.5;
+      cursor:not-allowed;
     }
 
-    tbody tr {
-      border-bottom: 1px solid #eee;
-      transition: background-color 0.2s ease;
+    .items{
+      width:100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 13.5px;
     }
-
-    tbody tr:hover {
-      background: #f9f9f9;
+    .items th{
+      text-align:left;
+      background: var(--gold);
+      padding: 10px;
+      font-weight: 900;
     }
-
-    tbody td {
-      padding: 16px 15px;
+    .items td{
+      padding: 10px;
+      border-bottom: 1px solid var(--line);
       vertical-align: top;
     }
-
-    .col-desc {
-      width: 50%;
-      font-weight: 500;
+    .items td.num, .items th.num{ text-align:right; }
+    .items td.actions{ width: 40px; text-align:right; }
+    .miniBtn{
+      background:#fff;
+      border:1px solid #d1d5db;
+      color:#111;
+      padding: 6px 8px;
+      border-radius: 10px;
+      font-weight: 900;
+      cursor:pointer;
     }
 
-    .col-qty {
-      width: 15%;
+    .previewWrap{ padding: 12px 14px 14px; }
+    .previewTools{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+      margin: 12px 0 0;
+    }
+    .hint{
+      font-size: 12px;
+      color:#555;
+      margin-top: 6px;
+      line-height: 1.4;
     }
 
-    .col-unit {
-      width: 15%;
+    /* ====== Rendered Document Template (A4) ====== */
+    @page { size: A4; margin: 14mm; }
+    .pageA4{
+      width: 210mm;
+      min-height: 297mm;
+      background:#fff;
+      padding: 18mm 16mm;
+      margin: 0 auto;
+      color:#111;
     }
-
-    .col-total {
-      width: 20%;
-    }
-
-    .amount {
-      text-align: right;
-      white-space: nowrap;
-      font-family: 'Courier New', monospace;
-      font-weight: 600;
-      color: #000;
-    }
-
-    /* SUMMARY */
-    .summary-block {
-      max-width: 300px;
-      margin-left: auto;
-      margin-top: 30px;
-      border-top: 2px solid #000000;
-      padding-top: 15px;
-      background: #f8f9fa;
-      padding: 15px;
-      border-radius: 8px;
-    }
-
-    .summary-row {
-      display: flex;
+    .docHeader{
+      display:flex;
       justify-content: space-between;
-      padding: 10px 0;
-      font-size: 16px;
+      gap: 18px;
+      align-items:flex-start;
     }
-
-    .summary-label {
-      font-weight: 600;
-      color: #333;
+    .docBrand{
+      display:flex;
+      gap: 14px;
+      align-items:flex-start;
     }
-
-    .summary-total {
+    .docLogo{
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+      display:block;
+    }
+    .docBrandText h1{
+      margin: 0;
+      font-size: 34px;
+      font-weight: 800;
+      line-height: 1.05;
+    }
+    .docTagline{
+      margin-top: 6px;
+      font-size: 14px;
+      color:#444;
+    }
+    .docContact{
       margin-top: 10px;
-      padding-top: 10px;
-      border-top: 2px solid #333;
-      font-weight: 700;
-      font-size: 17px;
-      color: #000;
-    }
-
-    /* FOOTER */
-    .footer {
-      margin-top: 40px;
       font-size: 14px;
-      color: #333;
-      border-top: 1px solid #ddd;
-      padding-top: 15px;
-      text-align: center;
-      font-style: italic;
-    }
-
-    .footer strong {
-      color: #000;
-      font-size: 16px;
-      font-weight: 600;
-    }
-
-    /* PRINT STYLES */
-    @media print {
-      @page {
-        size: A4;
-        margin: 20mm;
-      }
-
-      body {
-        background: #fff !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        font-size: 12pt !important;
-        line-height: 1.4 !important;
-      }
-
-      .container {
-        display: block !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-      }
-
-      .input-panel {
-        display: none !important;
-      }
-
-      .invoice-preview {
-        width: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-      }
-
-      .page {
-        width: 100% !important;
-        max-width: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        box-shadow: none !important;
-        border-radius: 0 !important;
-        page-break-inside: avoid !important;
-        page-break-after: avoid !important;
-        border: none !important;
-      }
-
-      .header {
-        border-bottom: 2px solid #000 !important;
-        margin-bottom: 25px !important;
-        padding-bottom: 20px !important;
-      }
-
-      .brand-logo {
-        width: 80px !important;
-        height: 80px !important;
-        box-shadow: none !important;
-        border: none !important;
-      }
-
-      .brand-name {
-        color: #000 !important;
-        -webkit-text-fill-color: #000 !important;
-        background: none !important;
-      }
-
-      table {
-        page-break-inside: auto !important;
-      }
-
-      tr {
-        page-break-inside: avoid !important;
-        page-break-after: auto !important;
-      }
-
-      thead {
-        display: table-header-group !important;
-      }
-
-      thead tr {
-        background: #333 !important;
-        -webkit-print-color-adjust: exact !important;
-        color-adjust: exact !important;
-      }
-
-      .summary-block {
-        page-break-inside: avoid !important;
-        background: #fff !important;
-        border: 1px solid #ddd !important;
-      }
-
-      .btn {
-        display: none !important;
-      }
-    }
-
-    /* RESPONSIVE DESIGN */
-    @media (max-width: 1200px) {
-      .container {
-        flex-direction: column;
-        gap: 25px;
-      }
-
-      .input-panel {
-        width: 100%;
-        position: relative;
-        top: 0;
-        max-width: 700px;
-        margin: 0 auto;
-      }
-
-      .invoice-preview {
-        width: 100%;
-      }
-
-      .page {
-        max-width: 100%;
-      }
-    }
-
-    @media (max-width: 1024px) {
-      body {
-        padding: 15px;
-      }
-
-      .container {
-        gap: 20px;
-      }
-
-      .input-panel {
-        padding: 20px;
-      }
-
-      .page {
-        padding: 30px;
-      }
-
-      .brand-name {
-        font-size: 28px;
-      }
-
-      .invoice-title {
-        font-size: 24px;
-      }
-
-      .brand-logo {
-        width: 80px;
-        height: 80px;
-      }
-    }
-
-    @media (max-width: 768px) {
-      body {
-        padding: 12px;
-      }
-
-      .input-panel {
-        padding: 18px;
-        border-radius: 10px;
-      }
-
-      .input-panel h2 {
-        font-size: 22px;
-        margin-bottom: 20px;
-      }
-
-      .form-group {
-        margin-bottom: 18px;
-      }
-
-      .form-group input,
-      .form-group select {
-        padding: 12px;
-        min-height: 46px;
-        font-size: 16px;
-      }
-
-      .items-section {
-        padding: 16px;
-      }
-
-      .item-row {
-        flex-direction: column;
-        gap: 10px;
-        align-items: stretch;
-      }
-
-      .item-row input {
-        min-height: 44px;
-        width: 100% !important;
-        max-width: 100% !important;
-      }
-
-      .item-row button {
-        min-height: 44px;
-        width: 100%;
-        margin-top: 5px;
-      }
-
-      .page {
-        padding: 25px;
-        border-radius: 10px;
-      }
-
-      .header {
-        flex-direction: column;
-        gap: 20px;
-        align-items: flex-start;
-      }
-
-      .brand-block {
-        width: 100%;
-        flex-direction: column;
-        text-align: center;
-        gap: 15px;
-      }
-
-      .brand-info {
-        text-align: center;
-      }
-
-      .invoice-block {
-        text-align: center;
-        width: 100%;
-        padding-left: 0;
-        border-left: none;
-        border-top: 1px solid #eee;
-        padding-top: 20px;
-      }
-
-      .brand-logo {
-        width: 70px;
-        height: 70px;
-        margin: 0 auto;
-      }
-
-      .brand-name {
-        font-size: 24px;
-      }
-
-      .brand-tagline,
-      .brand-contact {
-        text-align: center;
-      }
-
-      .meta-table {
-        width: 100%;
-      }
-
-      .meta-table td {
-        padding: 5px 0;
-        display: block;
-        width: 100%;
-        text-align: center;
-      }
-
-      .meta-label {
-        text-align: center;
-        font-weight: 700;
-      }
-
-      table {
-        font-size: 14px;
-      }
-
-      thead th {
-        padding: 14px 10px;
-        font-size: 12px;
-      }
-
-      tbody td {
-        padding: 14px 10px;
-      }
-
-      .action-buttons {
-        flex-direction: column;
-        gap: 12px;
-      }
-
-      .btn {
-        min-height: 48px;
-        font-size: 16px;
-      }
-
-      .summary-block {
-        max-width: 100%;
-        margin-top: 25px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      body {
-        padding: 10px;
-      }
-
-      .input-panel {
-        padding: 15px;
-        min-width: 0;
-      }
-
-      .form-group {
-        margin-bottom: 15px;
-      }
-
-      .items-section {
-        padding: 12px;
-      }
-
-      .page {
-        padding: 20px;
-      }
-
-      .brand-name {
-        font-size: 22px;
-      }
-
-      .invoice-title {
-        font-size: 20px;
-        margin-bottom: 10px;
-      }
-
-      .brand-logo {
-        width: 60px;
-        height: 60px;
-      }
-
-      table {
-        font-size: 13px;
-      }
-
-      thead th {
-        padding: 12px 8px;
-        font-size: 11px;
-      }
-
-      tbody td {
-        padding: 12px 8px;
-      }
-
-      .summary-row {
-        font-size: 14px;
-        padding: 8px 0;
-      }
-
-      .footer {
-        margin-top: 30px;
-        font-size: 13px;
-      }
-    }
-
-    /* Loading state */
-    .loading {
-      position: relative;
-      pointer-events: none;
-      opacity: 0.8;
-    }
-
-    .loading::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 20px;
-      height: 20px;
-      margin: -10px 0 0 -10px;
-      border: 3px solid rgba(255, 255, 255, 0.3);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* Clean section styles */
-    .clean-section {
-      background: #f8f9fa;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 25px;
-    }
-
-    .clean-section h3 {
-      color: #333;
-      margin-bottom: 15px;
-      font-size: 18px;
-      font-weight: 600;
-      text-align: center;
-    }
-
-    .clean-section p {
-      color: #666;
-      font-size: 14px;
+      color:#222;
       line-height: 1.5;
-      margin-bottom: 15px;
-      text-align: center;
+    }
+    .docBox{
+      text-align:right;
+      min-width: 270px;
+    }
+    .docTitle{
+      font-size: 34px;
+      font-weight: 900;
+      letter-spacing: .5px;
+      margin: 0 0 10px 0;
+      text-transform: uppercase;
+    }
+    .docMeta{
+      display:inline-block;
+      text-align:right;
+      font-size: 16px;
+    }
+    .metaRow{
+      display:grid;
+      grid-template-columns: 120px 130px;
+      gap: 8px;
+      align-items: baseline;
+      margin: 6px 0;
+    }
+    .metaRow .k{ font-weight: 800; }
+    .metaRow .v{ font-weight: 600; }
+
+    .dividerGold{ height: 3px; background: var(--gold); margin: 18px 0; }
+
+    .guestLine{
+      margin: 0 0 12px 0;
+      font-size: 15px;
+      color:#111;
+      display:flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .guestLine strong{ font-weight: 800; }
+
+    .docTable{
+      width:100%;
+      border-collapse: collapse;
+      margin-top: 6px;
+      font-size: 16px;
+    }
+    .docTable thead th{
+      background: var(--gold);
+      color:#000;
+      text-align:left;
+      padding: 12px 12px;
+      font-weight: 900;
+      border: 1px solid var(--gold);
+      text-transform: uppercase;
+    }
+    .docTable tbody td{
+      padding: 14px 12px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    .colQty{ width: 120px; }
+    .colUnit{ width: 160px; text-align:right; }
+    .colTotal{ width: 160px; text-align:right; }
+
+    .totalsWrap{
+      margin-top: 22px;
+      display:flex;
+      justify-content: flex-end;
+    }
+    .totals{
+      width: 380px;
+      font-size: 16px;
+    }
+    .totalsTopLine{ border-top: 2px solid #111; margin-bottom: 10px; }
+    .tRow{ display:flex; justify-content: space-between; padding: 6px 0; }
+    .tRow .label{ font-weight: 700; color:#111; }
+    .tRow .value{ font-weight: 700; }
+    .goldLine{ height: 3px; background: var(--gold); margin: 8px 0 10px 0; }
+    .tTotal{ display:flex; justify-content: space-between; align-items: baseline; font-size: 22px; font-weight: 900; }
+
+    .receiptInfo{
+      margin-top: 18px;
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+      font-size: 16px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 20px;
+    }
+    .receiptInfo .rRow{
+      display:flex; justify-content: space-between; gap: 10px;
+      border-bottom: 1px dashed #e7e7e7;
+      padding: 8px 0;
+    }
+    .receiptInfo .rRow:last-child{ border-bottom:none; }
+    .receiptInfo .rk{ font-weight: 800; }
+    .receiptInfo .rv{ font-weight: 700; }
+
+    .docFooter{
+      margin-top: 70px;
+      border-top: 1px solid #e6e6e6;
+      padding-top: 18px;
+      display:flex;
+      justify-content: flex-end;
+      font-weight: 800;
+      color:#111;
+    }
+
+    .hiddenRender{
+      position: fixed;
+      left: -99999px;
+      top: 0;
+      width: 210mm;
+      background: #fff;
+    }
+
+    /* History list */
+    .historyList{ display:flex; flex-direction: column; gap: 8px; }
+    .histItem{
+      border:1px solid #e5e7eb; border-radius:12px; padding:10px 10px;
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items:center;
+      background:#fff;
+    }
+    .histItem .hTitle{ font-weight: 900; font-size: 13.5px; }
+    .histItem .hMeta{ font-size: 12px; color:#555; margin-top: 2px; }
+    .histBtns{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+    .small{ font-size: 11.5px; color:#555; }
+
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
     }
   </style>
 </head>
 
 <body>
-  <div class="container">
-    <!-- INPUT PANEL -->
-    <div class="input-panel">
-      <h2>Invoice Generator</h2>
-
-      <!-- Document Type -->
-      <div class="form-group">
-        <label for="documentType">Document Type</label>
-        <select id="documentType" onchange="updateInvoice()">
-          <option value="invoice">Invoice (Final)</option>
-          <option value="advance">Advance Payment Receipt</option>
-          <option value="proforma">Proforma Invoice / Quotation</option>
-          <option value="receipt">Payment Receipt</option>
-        </select>
-      </div>
-
-      <!-- Reference Number -->
-      <div class="form-group">
-        <label for="invoiceNumber">Reference Number</label>
-        <input type="text" id="invoiceNumber" value="000158" oninput="updateInvoice()">
-      </div>
-
-      <!-- Date -->
-      <div class="form-group">
-        <label for="invoiceDate">Date</label>
-        <input type="date" id="invoiceDate" value="2025-12-29" oninput="updateInvoice()">
-      </div>
-
-      <!-- Booking Information Section -->
-      <div class="clean-section">
-        <h3>Booking Information</h3>
-        <div id="itemsContainer">
-          <div class="item-row">
-            <input type="text" class="desc-input" placeholder="Booking Description" 
-                   value="Booking Service" oninput="updateItem(0, 'description', this.value)">
-            <input type="number" class="qty-input" placeholder="Qty" 
-                   value="1" min="1" oninput="updateItem(0, 'quantity', this.value)">
-            <input type="number" class="price-input" placeholder="Price (LKR)" 
-                   value="20000" min="0" oninput="updateItem(0, 'unitPrice', this.value)">
-          </div>
+  <div class="app">
+    <div class="top">
+      <div class="brand">
+        <img src="logo.png" alt="Logo" />
+        <div>
+          <div class="t1">Sunset Escape Billing System</div>
+          <div class="t2">Quotation • Proforma Invoice • Invoice • Payment Receipt (PDF)</div>
         </div>
-        <p>Add additional booking items if needed</p>
-        <button class="add-item-btn" onclick="addNewItem()">+ Add Another Item</button>
       </div>
-
-      <!-- Advanced Payment Section -->
-      <div class="clean-section">
-        <h3>Advanced Payment</h3>
-        <div class="form-group">
-          <label for="advancedPayment" id="amountPaidLabel">Advanced Payment (LKR)</label>
-          <input type="number" id="advancedPayment" value="15000" min="0" oninput="updateInvoice()">
-        </div>
-        <p>Enter the advance amount received</p>
-      </div>
-
-      <!-- Payment method + reference (shown for advance & receipt only) -->
-      <div class="form-group" id="paymentMethodGroup" style="display:none;">
-        <label for="paymentMethod">Payment Method</label>
-        <select id="paymentMethod" onchange="updateInvoice()">
-          <option value="Bank Transfer">Bank Transfer</option>
-          <option value="Cash">Cash</option>
-          <option value="Online Payment">Online Payment</option>
-        </select>
-      </div>
-
-      <div class="form-group" id="transactionRefGroup" style="display:none;">
-        <label for="transactionRef">Transaction Reference</label>
-        <input type="text" id="transactionRef" placeholder="Bank slip / Ref No" oninput="updateInvoice()">
-      </div>
-
-      <!-- Action Buttons -->
-      <div class="action-buttons">
-        <button class="btn btn-primary" onclick="customPrint()">
-          <span>📄</span> Print Invoice
-        </button>
-        <button class="btn btn-secondary" onclick="downloadPDF()" id="pdfDownloadBtn">
-          <span>💾</span> Download PDF
-        </button>
+      <div class="pillbar">
+        <div class="pill">Address: 15/4 Wakanda road, Homagama</div>
+        <div class="pill">Phone: +94 71 417 5072</div>
+        <div class="pill">Email: sunset.escape24@gmail.com</div>
       </div>
     </div>
 
-    <!-- INVOICE PREVIEW -->
-    <div class="invoice-preview">
-      <div class="page">
-        <!-- HEADER -->
-        <div class="header">
-          <div class="brand-block">
-            <!-- Logo will be loaded here -->
-            <img src="logo.png" alt="Sunset Escape Logo" class="brand-logo" id="logoImage" 
-                 onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';">
-            <div id="logoFallback" class="brand-logo" style="display: none; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; background: #333;">
-              SE
+    <div class="grid">
+      <!-- LEFT: INPUTS -->
+      <div class="card">
+        <div class="cardHeader">
+          <h2>Create / Edit Document</h2>
+          <div class="small" id="modeLabel">Mode: New</div>
+        </div>
+        <div class="cardBody">
+          <label>Document Type</label>
+          <select id="docType">
+            <option value="QUOTATION">Quotation</option>
+            <option value="PROFORMA">Proforma Invoice</option>
+            <option value="INVOICE">Invoice</option>
+            <option value="RECEIPT">Payment Receipt</option>
+          </select>
+
+          <div class="row2">
+            <div>
+              <label>Document #</label>
+              <input id="docNumber" placeholder="Auto" readonly />
             </div>
-            <div class="brand-info">
-              <div class="brand-name">Sunset Escape</div>
-              <div class="brand-tagline">Beyond the ordinary, into luxury</div>
-              <div class="brand-contact">
-                <span>📞 +94 71 417 5072</span>
-                <span>📍 Sunset Escape Homagama</span>
+            <div>
+              <label>Date</label>
+              <input id="docDate" type="date" />
+            </div>
+          </div>
+
+          <div class="row2" id="quotationExtra" style="display:none;">
+            <div>
+              <label>Valid Until</label>
+              <input id="validUntil" type="date" />
+            </div>
+            <div>
+              <label>Reference (optional)</label>
+              <input id="reference" placeholder="e.g., Booking / Guest / Note" />
+            </div>
+          </div>
+
+          <div class="row2" id="commonRefRow">
+            <div>
+              <label>Customer Name</label>
+              <input id="customerName" placeholder="Customer name" />
+            </div>
+            <div>
+              <label>Customer Phone</label>
+              <input id="customerPhone" placeholder="Customer phone" />
+            </div>
+          </div>
+
+          <!-- Receipt-only -->
+          <div id="receiptFields" style="display:none;">
+            <div class="row2">
+              <div>
+                <label>For Invoice # (optional)</label>
+                <input id="forInvoiceNumber" placeholder="e.g., 000156" />
+              </div>
+              <div>
+                <label>Date & Time (text)</label>
+                <input id="receiptDateTimeText" placeholder="e.g., 26 / 12 / 2025 • 7:30 PM" />
+              </div>
+            </div>
+            <div class="row2">
+              <div>
+                <label>Payment Method</label>
+                <input id="paymentMethod" placeholder="Cash / Bank Transfer / Card" />
+              </div>
+              <div>
+                <label>Reference No (Txn/Slip)</label>
+                <input id="paymentRef" placeholder="Txn / Slip number" />
+              </div>
+            </div>
+            <label>Receipt Amount</label>
+            <input id="receiptAmount" type="number" min="0" step="0.01" placeholder="Amount received" />
+          </div>
+
+          <!-- Items -->
+          <div id="itemsSection">
+            <label>Add Line Item</label>
+            <div class="row3">
+              <input id="itemDesc" placeholder="Description" />
+              <input id="itemQty" type="number" min="0" step="1" placeholder="Qty" />
+              <input id="itemUnit" type="number" min="0" step="0.01" placeholder="Unit Price" />
+            </div>
+            <div class="btnRow" style="margin-top:10px;">
+              <button class="secondary" type="button" id="addItemBtn">Add Item</button>
+              <button class="secondary" type="button" id="clearItemsBtn">Clear Items</button>
+            </div>
+
+            <table class="items" id="itemsTable">
+              <thead>
+                <tr>
+                  <th>Description</th>
+                  <th class="num">Qty</th>
+                  <th class="num">Unit</th>
+                  <th class="num">Total</th>
+                  <th class="actions"></th>
+                </tr>
+              </thead>
+              <tbody id="itemsTbody"></tbody>
+            </table>
+
+            <div class="row2">
+              <div>
+                <label>Advanced (optional)</label>
+                <input id="advanced" type="number" min="0" step="0.01" value="0" />
+              </div>
+              <div>
+                <label>Currency</label>
+                <select id="currency">
+                  <option value="LKR">LKR</option>
+                  <option value="USD">USD</option>
+                  <option value="EUR">EUR</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="hint">
+              Invoices/Quotations/Proforma are bills for the customer to pay.
+              Payment Receipt is issued separately after payment.
+            </div>
+          </div>
+
+          <div class="btnRow">
+            <button type="button" id="newBtn" class="secondary">New</button>
+            <button type="button" id="saveBtn">Save</button>
+            <button type="button" id="downloadBtn">Download PDF</button>
+          </div>
+
+          <div class="btnRow">
+            <button type="button" id="deleteBtn" class="danger" disabled>Delete</button>
+            <button type="button" id="resetDataBtn" class="secondary">Reset All Data</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: PREVIEW + HISTORY -->
+      <div class="card">
+        <div class="cardHeader">
+          <h2>Preview & History</h2>
+          <div class="small" id="countLabel"></div>
+        </div>
+        <div class="previewWrap">
+          <div class="hint">Preview updates automatically. Use <b>Download PDF</b> for the final document.</div>
+          <div style="height:10px;"></div>
+
+          <div class="card" style="box-shadow:none;">
+            <div class="cardHeader" style="border-bottom:1px solid #e5e7eb;">
+              <h2>Live Preview</h2>
+              <div class="small" id="previewType"></div>
+            </div>
+            <div class="cardBody" style="padding: 0;">
+              <div id="previewContainer" style="transform: scale(.62); transform-origin: top left; width: 161%; background:#fff; border-radius: 14px;">
+                <!-- Rendered document will appear here -->
               </div>
             </div>
           </div>
 
-          <div class="invoice-block">
-            <div class="invoice-title" id="documentTitle">Invoice</div>
-            
-            <!-- STATUS: PAID (Receipt mode) -->
-            <div class="status-badge" id="paymentStatus">STATUS: PAID</div>
+          <div style="height:12px;"></div>
 
-            <table class="meta-table">
-              <tr>
-                <td class="meta-label" id="metaLabel">Invoice #</td>
-                <td id="displayInvoiceNumber">000158</td>
-              </tr>
-              <tr>
-                <td class="meta-label">Date</td>
-                <td id="displayInvoiceDate">29 / 12 / 2025</td>
-              </tr>
-            </table>
+          <div class="card" style="box-shadow:none;">
+            <div class="cardHeader" style="border-bottom:1px solid #e5e7eb;">
+              <h2>Saved Documents</h2>
+              <div class="small">Click to open, download, or delete</div>
+            </div>
+            <div class="cardBody">
+              <div class="historyList" id="historyList"></div>
+            </div>
           </div>
-        </div>
-
-        <!-- Receipt reference line (Receipt mode) -->
-        <div class="receipt-ref" id="receiptRef">
-          Received against Invoice No: <strong id="receiptInvoiceRef"></strong>
-          <span id="paymentMetaInline" style="display:block;margin-top:10px;font-size:14px;"></span>
-        </div>
-
-        <!-- BOOKING TABLE -->
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th class="col-desc">Booking Details</th>
-                <th class="col-qty">Quantity</th>
-                <th class="col-unit">Unit Price (LKR)</th>
-                <th class="col-total">Total (LKR)</th>
-              </tr>
-            </thead>
-            <tbody id="invoiceItemsTable">
-              <tr>
-                <td class="col-desc">Booking Service</td>
-                <td class="col-qty">1</td>
-                <td class="col-unit amount">20,000</td>
-                <td class="col-total amount">20,000</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- SUMMARY -->
-        <div class="summary-block">
-          <div class="summary-row" id="summaryRow1">
-            <span class="summary-label" id="summaryLabel1">Sub Total</span>
-            <span class="amount" id="subTotal">20,000</span>
-          </div>
-          <div class="summary-row" id="summaryRow2">
-            <span class="summary-label" id="summaryLabel2">Advanced</span>
-            <span class="amount" id="advancedAmount">15,000</span>
-          </div>
-          <div class="summary-row summary-total" id="summaryRow3">
-            <span class="summary-label" id="summaryLabel3">Balance Payable</span>
-            <span class="amount" id="totalAmount">5,000</span>
-          </div>
-        </div>
-
-        <!-- FOOTER -->
-        <div class="footer">
-          <strong>Thank you for choosing Sunset Escape.</strong>
         </div>
       </div>
     </div>
+
+    <!-- hidden render target for PDF -->
+    <div class="hiddenRender" id="pdfMount"></div>
   </div>
 
-  <!-- html2pdf.js library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
   <script>
-    // Initialize with sample data matching the PDF
-    let invoiceData = {
-      documentType: 'invoice',
-      invoiceNumber: '000158',
-      date: '2025-12-29',
-      items: [
-        { description: 'Booking Service', quantity: 1, unitPrice: 20000 }
-      ],
-      advancedPayment: 15000,
-      paymentMethod: 'Bank Transfer',
-      transactionRef: ''
+    /***********************
+     * Storage + Utilities *
+     ***********************/
+    const STORAGE_KEY = "sunset_escape_docs_v1";
+    const COUNTER_KEY = "sunset_escape_counters_v1";
+
+    const BRAND = {
+      name: "Sunset Escape",
+      tagline: "Beyond the ordinary, into luxury",
+      phone: "+94 71 417 5072",
+      locationLine: "Sunset Escape Homagama",
+      logoSrc: "logo.png"
     };
 
-    // Helper function to get today's date
-    function getTodayDate() {
-      const today = new Date();
-      return today.toISOString().split('T')[0];
-    }
+    const TYPE_LABEL = {
+      QUOTATION: "QUOTATION",
+      PROFORMA: "PROFORMA INVOICE",
+      INVOICE: "INVOICE",
+      RECEIPT: "PAYMENT RECEIPT"
+    };
 
-    // Helper to get next invoice number
-    function getNextInvoiceNumber() {
-      const STORAGE_KEY = 'sunsetEscapeLastInvoiceNumber';
-      let lastNumber = parseInt(localStorage.getItem(STORAGE_KEY) || '158', 10);
-      return String(lastNumber + 1).padStart(6, '0');
-    }
+    const TYPE_META_LABEL_1 = {
+      QUOTATION: "Quotation #",
+      PROFORMA: "Proforma #",
+      INVOICE: "Invoice #",
+      RECEIPT: "Receipt #"
+    };
 
-    // Initialize form
-    function initializeForm() {
-      // Set form values
-      document.getElementById('documentType').value = invoiceData.documentType;
-      document.getElementById('invoiceNumber').value = invoiceData.invoiceNumber;
-      document.getElementById('invoiceDate').value = invoiceData.date;
-      document.getElementById('advancedPayment').value = invoiceData.advancedPayment;
-      
-      // Update invoice
-      updateInvoice();
-      
-      // Set up auto-increment
-      setupAutoIncrement();
-      
-      // Load logo with error handling
-      loadLogo();
-    }
+    const pad6 = (n) => String(n).padStart(6, "0");
 
-    function loadLogo() {
-      const logoImg = document.getElementById('logoImage');
-      const logoFallback = document.getElementById('logoFallback');
-      
-      // Try to load logo
-      logoImg.onload = function() {
-        logoFallback.style.display = 'none';
-      };
-      
-      logoImg.onerror = function() {
-        this.style.display = 'none';
-        logoFallback.style.display = 'flex';
-      };
-    }
+    const todayISO = () => {
+      const d = new Date();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth()+1).padStart(2,"0");
+      const dd = String(d.getDate()).padStart(2,"0");
+      return `${yyyy}-${mm}-${dd}`;
+    };
 
-    function setupAutoIncrement() {
-      const invoiceInput = document.getElementById('invoiceNumber');
-      invoiceInput.addEventListener('blur', function() {
-        const numValue = parseInt(this.value);
-        if (!isNaN(numValue)) {
-          localStorage.setItem('sunsetEscapeLastInvoiceNumber', numValue);
-        }
-      });
-    }
+    const money = (n) => {
+      const v = Number(n || 0);
+      return v.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    };
 
-    function updateItem(index, field, value) {
-      if (field === 'quantity' || field === 'unitPrice') {
-        const numValue = parseFloat(value);
-        if (isNaN(numValue) || numValue < 0) {
-          value = field === 'quantity' ? 1 : 0;
-        } else {
-          value = numValue;
-        }
-      }
-      invoiceData.items[index][field] = value;
-      updateInvoice();
-    }
+    const sumItems = (items) => items.reduce((acc, it) => acc + (Number(it.qty||0) * Number(it.unit||0)), 0);
 
-    function addNewItem() {
-      invoiceData.items.push({ description: 'Additional Service', quantity: 1, unitPrice: 0 });
-      renderItems();
-      updateInvoice();
-    }
+    const loadDocs = () => {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+      catch { return []; }
+    };
 
-    function renderItems() {
-      const container = document.getElementById('itemsContainer');
-      container.innerHTML = '';
+    const saveDocs = (docs) => localStorage.setItem(STORAGE_KEY, JSON.stringify(docs));
 
-      invoiceData.items.forEach((item, index) => {
-        const itemDiv = document.createElement('div');
-        itemDiv.className = 'item-row';
-        itemDiv.innerHTML = `
-          <input type="text" class="desc-input" placeholder="Booking Description" 
-                 value="${escapeHtml(item.description)}"
-                 oninput="updateItem(${index}, 'description', this.value)">
-          <input type="number" class="qty-input" placeholder="Qty" 
-                 value="${item.quantity}" min="1" step="1"
-                 oninput="updateItem(${index}, 'quantity', this.value)">
-          <input type="number" class="price-input" placeholder="Price (LKR)" 
-                 value="${item.unitPrice}" min="0" step="100"
-                 oninput="updateItem(${index}, 'unitPrice', this.value)">
-          ${invoiceData.items.length > 1 ? `<button onclick="removeItem(${index})" aria-label="Remove item">×</button>` : ''}
-        `;
-        container.appendChild(itemDiv);
-      });
-    }
-
-    function removeItem(index) {
-      if (invoiceData.items.length > 1) {
-        invoiceData.items.splice(index, 1);
-        renderItems();
-        updateInvoice();
-      } else {
-        alert('At least one item is required');
-      }
-    }
-
-    function escapeHtml(str) {
-      return (str ?? '').toString()
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
-
-    function formatCurrency(amount) {
-      if (isNaN(amount)) return '0';
-      return amount.toLocaleString('en-US', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-      });
-    }
-
-    function formatDate(dateString) {
-      if (!dateString) return '';
-      const date = new Date(dateString);
-      if (isNaN(date.getTime())) return '';
-      const day = date.getDate().toString().padStart(2, '0');
-      const month = (date.getMonth() + 1).toString().padStart(2, '0');
-      const year = date.getFullYear();
-      return `${day} / ${month} / ${year}`;
-    }
-
-    function updateInvoice() {
-      // Update from form values
-      invoiceData.documentType = document.getElementById('documentType').value;
-      invoiceData.invoiceNumber = document.getElementById('invoiceNumber').value.trim();
-      invoiceData.date = document.getElementById('invoiceDate').value;
-      invoiceData.advancedPayment = parseFloat(document.getElementById('advancedPayment').value) || 0;
-      invoiceData.paymentMethod = document.getElementById('paymentMethod').value;
-      invoiceData.transactionRef = document.getElementById('transactionRef').value;
-
-      // Update document title
-      const titles = {
-        'invoice': 'Invoice',
-        'advance': 'Advance Payment Receipt',
-        'proforma': 'Proforma Invoice',
-        'receipt': 'Payment Receipt'
-      };
-      document.getElementById('documentTitle').textContent = titles[invoiceData.documentType] || 'Invoice';
-
-      // Update meta label
-      const metaLabels = {
-        'invoice': 'Invoice #',
-        'advance': 'Receipt #',
-        'proforma': 'Reference #',
-        'receipt': 'Receipt #'
-      };
-      document.getElementById('metaLabel').textContent = metaLabels[invoiceData.documentType] || 'Invoice #';
-
-      // Update displayed values
-      document.getElementById('displayInvoiceNumber').textContent = invoiceData.invoiceNumber;
-      document.getElementById('displayInvoiceDate').textContent = formatDate(invoiceData.date);
-
-      // Show/hide payment fields
-      const showPaymentFields = invoiceData.documentType === 'advance' || invoiceData.documentType === 'receipt';
-      document.getElementById('paymentMethodGroup').style.display = showPaymentFields ? 'block' : 'none';
-      document.getElementById('transactionRefGroup').style.display = showPaymentFields ? 'block' : 'none';
-
-      // Update amount label
-      const labelMap = {
-        'invoice': 'Advanced Payment (LKR)',
-        'advance': 'Advance Paid (LKR)',
-        'proforma': 'Advanced Payment (LKR)',
-        'receipt': 'Amount Received (LKR)'
-      };
-      document.getElementById('amountPaidLabel').textContent = labelMap[invoiceData.documentType] || 'Advanced Payment (LKR)';
-
-      // Update status badge
-      document.getElementById('paymentStatus').style.display = 
-        invoiceData.documentType === 'receipt' ? 'inline-block' : 'none';
-
-      // Update receipt reference
-      const receiptRef = document.getElementById('receiptRef');
-      if (invoiceData.documentType === 'receipt') {
-        receiptRef.style.display = 'block';
-        document.getElementById('receiptInvoiceRef').textContent = invoiceData.invoiceNumber;
-        
-        const parts = [];
-        if (invoiceData.paymentMethod) {
-          parts.push(`Method: <strong>${escapeHtml(invoiceData.paymentMethod)}</strong>`);
-        }
-        if (invoiceData.transactionRef) {
-          parts.push(`Ref: <strong>${escapeHtml(invoiceData.transactionRef)}</strong>`);
-        }
-        document.getElementById('paymentMetaInline').innerHTML = parts.join(' &nbsp;|&nbsp; ');
-      } else {
-        receiptRef.style.display = 'none';
-      }
-
-      // Update items table
-      const tableBody = document.getElementById('invoiceItemsTable');
-      tableBody.innerHTML = '';
-
-      let subTotal = 0;
-      invoiceData.items.forEach(item => {
-        const qty = parseFloat(item.quantity) || 0;
-        const price = parseFloat(item.unitPrice) || 0;
-        const total = qty * price;
-        subTotal += total;
-
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td class="col-desc">${escapeHtml(item.description)}</td>
-          <td class="col-qty">${qty}</td>
-          <td class="col-unit amount">${formatCurrency(price)}</td>
-          <td class="col-total amount">${formatCurrency(total)}</td>
-        `;
-        tableBody.appendChild(row);
-      });
-
-      // Update summary
-      const advanced = invoiceData.advancedPayment;
-      let balance = subTotal - advanced;
-      
-      // Ensure balance is not negative
-      if (balance < 0) balance = 0;
-
-      // Update summary labels based on document type
-      const label1 = document.getElementById('summaryLabel1');
-      const label2 = document.getElementById('summaryLabel2');
-      const label3 = document.getElementById('summaryLabel3');
-      const row2 = document.getElementById('summaryRow2');
-      const row3 = document.getElementById('summaryRow3');
-
-      switch(invoiceData.documentType) {
-        case 'invoice':
-          label1.textContent = 'Sub Total';
-          label2.textContent = 'Advanced';
-          label3.textContent = 'Balance Payable';
-          row2.style.display = 'flex';
-          row3.style.display = 'flex';
-          break;
-        case 'advance':
-          label1.textContent = 'Total Booking Value';
-          label2.textContent = 'Advance Paid';
-          label3.textContent = 'Balance Payable';
-          row2.style.display = 'flex';
-          row3.style.display = 'flex';
-          break;
-        case 'proforma':
-          label1.textContent = 'Estimated Total';
-          row2.style.display = 'none';
-          row3.style.display = 'none';
-          balance = subTotal; // Show full amount
-          break;
-        case 'receipt':
-          label1.textContent = 'Invoice Total';
-          label2.textContent = 'Amount Received';
-          label3.textContent = 'Balance Due';
-          row2.style.display = 'flex';
-          row3.style.display = 'flex';
-          break;
-      }
-
-      // Update amounts
-      document.getElementById('subTotal').textContent = formatCurrency(subTotal);
-      document.getElementById('advancedAmount').textContent = formatCurrency(advanced);
-      document.getElementById('totalAmount').textContent = formatCurrency(balance);
-    }
-
-    function customPrint() {
-      const inputPanel = document.querySelector('.input-panel');
-      const originalDisplay = inputPanel.style.display;
-      inputPanel.style.display = 'none';
-      
-      // Set print styles
-      const originalBodyStyles = {
-        background: document.body.style.background,
-        padding: document.body.style.padding
-      };
-      
-      document.body.style.background = '#fff';
-      document.body.style.padding = '0';
-      
-      // Trigger print
-      setTimeout(() => {
-        window.print();
-        
-        // Restore styles
-        setTimeout(() => {
-          inputPanel.style.display = originalDisplay;
-          document.body.style.background = originalBodyStyles.background;
-          document.body.style.padding = originalBodyStyles.padding;
-        }, 500);
-      }, 100);
-    }
-
-    // FIXED PDF DOWNLOAD FUNCTION
-    async function downloadPDF() {
-      const invoiceElement = document.querySelector('.page');
-      const inputPanel = document.querySelector('.input-panel');
-      const downloadBtn = document.getElementById('pdfDownloadBtn');
-      const originalBtnText = downloadBtn.textContent;
-      
-      // Show loading state
-      downloadBtn.classList.add('loading');
-      downloadBtn.disabled = true;
-      downloadBtn.textContent = 'Generating PDF...';
-      
+    const loadCounters = () => {
       try {
-        // Check if html2pdf is loaded
-        if (typeof html2pdf === 'undefined') {
-          throw new Error('PDF library not loaded');
-        }
-        
-        // Hide input panel temporarily
-        inputPanel.style.display = 'none';
-        
-        // Store original styles
-        const originalStyles = {
-          bodyPadding: document.body.style.padding,
-          bodyBackground: document.body.style.background,
-          containerDisplay: document.querySelector('.container').style.display,
-          elementStyles: {
-            margin: invoiceElement.style.margin,
-            boxShadow: invoiceElement.style.boxShadow,
-            borderRadius: invoiceElement.style.borderRadius,
-            width: invoiceElement.style.width,
-            maxWidth: invoiceElement.style.maxWidth
-          }
-        };
-        
-        // Prepare for PDF capture
-        document.body.style.padding = '0';
-        document.body.style.background = '#fff';
-        document.querySelector('.container').style.display = 'block';
-        
-        invoiceElement.style.margin = '0 auto';
-        invoiceElement.style.boxShadow = 'none';
-        invoiceElement.style.borderRadius = '0';
-        invoiceElement.style.width = '210mm';
-        invoiceElement.style.maxWidth = '210mm';
-        
-        // Wait for any rendering to complete
-        await new Promise(resolve => setTimeout(resolve, 300));
-        
-        // Generate PDF filename
-        const docTypeMap = {
-          'invoice': 'Invoice',
-          'advance': 'Advance_Receipt',
-          'proforma': 'Proforma_Invoice',
-          'receipt': 'Payment_Receipt'
-        };
-        
-        const docTypeName = docTypeMap[invoiceData.documentType] || 'Invoice';
-        const fileName = `Sunset_Escape_${docTypeName}_${invoiceData.invoiceNumber}.pdf`;
-        
-        // Configure html2pdf with better settings
-        const opt = {
-          margin: [10, 10, 10, 10],
-          filename: fileName,
-          image: { 
-            type: 'jpeg', 
-            quality: 0.98,
-            cache: false
-          },
-          html2canvas: { 
-            scale: 2, // Reduced from 3 for better performance
-            useCORS: true,
-            logging: false,
-            backgroundColor: '#ffffff',
-            scrollX: 0,
-            scrollY: 0,
-            windowWidth: 794,
-            width: 794,
-            height: invoiceElement.scrollHeight + 50,
-            onclone: function(clonedDoc) {
-              // Ensure proper styling in cloned document
-              const logo = clonedDoc.getElementById('logoImage');
-              const fallback = clonedDoc.getElementById('logoFallback');
-              if (logo && logo.naturalWidth === 0) {
-                logo.style.display = 'none';
-                if (fallback) fallback.style.display = 'flex';
-              }
-              // Ensure black text is preserved
-              const brandName = clonedDoc.querySelector('.brand-name');
-              if (brandName) {
-                brandName.style.color = '#000000';
-                brandName.style.backgroundImage = 'none';
-                brandName.style.webkitBackgroundClip = 'unset';
-                brandName.style.webkitTextFillColor = '#000000';
-              }
-            }
-          },
-          jsPDF: {
-            unit: 'mm',
-            format: 'a4',
-            orientation: 'portrait',
-            compress: true
-          },
-          pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-        };
-        
-        // Generate PDF
-        await html2pdf().set(opt).from(invoiceElement).save();
-        
-        // Success - auto-increment invoice number
-        const currentNumber = parseInt(invoiceData.invoiceNumber) || 158;
-        if (!isNaN(currentNumber)) {
-          localStorage.setItem('sunsetEscapeLastInvoiceNumber', currentNumber);
-          invoiceData.invoiceNumber = getNextInvoiceNumber();
-          document.getElementById('invoiceNumber').value = invoiceData.invoiceNumber;
-          updateInvoice();
-        }
-        
-        // Show success message on mobile
-        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-          setTimeout(() => {
-            alert('PDF generated successfully! Check your downloads folder.');
-          }, 1000);
-        }
-        
-      } catch (error) {
-        console.error('PDF generation error:', error);
-        
-        // Fallback to print on error
-        alert('PDF generation failed. Using print as fallback...');
-        customPrint();
-        
-      } finally {
-        // Always restore everything
-        inputPanel.style.display = 'block';
-        document.body.style.padding = originalStyles?.bodyPadding || '';
-        document.body.style.background = originalStyles?.bodyBackground || '';
-        if (document.querySelector('.container')) {
-          document.querySelector('.container').style.display = originalStyles?.containerDisplay || '';
-        }
-        
-        // Restore element styles
-        if (originalStyles?.elementStyles && invoiceElement) {
-          invoiceElement.style.margin = originalStyles.elementStyles.margin;
-          invoiceElement.style.boxShadow = originalStyles.elementStyles.boxShadow;
-          invoiceElement.style.borderRadius = originalStyles.elementStyles.borderRadius;
-          invoiceElement.style.width = originalStyles.elementStyles.width;
-          invoiceElement.style.maxWidth = originalStyles.elementStyles.maxWidth;
-        }
-        
-        // Reset button
-        downloadBtn.classList.remove('loading');
-        downloadBtn.disabled = false;
-        downloadBtn.textContent = originalBtnText;
+        return JSON.parse(localStorage.getItem(COUNTER_KEY)) || { QUOTATION: 0, PROFORMA: 0, INVOICE: 0, RECEIPT: 0 };
+      } catch {
+        return { QUOTATION: 0, PROFORMA: 0, INVOICE: 0, RECEIPT: 0 };
+      }
+    };
+
+    const saveCounters = (counters) => localStorage.setItem(COUNTER_KEY, JSON.stringify(counters));
+
+    const nextNumberForType = (type) => {
+      const counters = loadCounters();
+      counters[type] = (counters[type] || 0) + 1;
+      saveCounters(counters);
+      return pad6(counters[type]);
+    };
+
+    const formatDateDDMMYYYY = (iso) => {
+      if (!iso) return "";
+      const [y,m,d] = iso.split("-");
+      return `${d} / ${m} / ${y}`;
+    };
+
+    /***********************
+     * UI Elements         *
+     ***********************/
+    const el = (id) => document.getElementById(id);
+
+    const docType = el("docType");
+    const docNumber = el("docNumber");
+    const docDate = el("docDate");
+    const validUntil = el("validUntil");
+    const reference = el("reference");
+    const customerName = el("customerName");
+    const customerPhone = el("customerPhone");
+
+    const receiptFields = el("receiptFields");
+    const forInvoiceNumber = el("forInvoiceNumber");
+    const receiptDateTimeText = el("receiptDateTimeText");
+    const paymentMethod = el("paymentMethod");
+    const paymentRef = el("paymentRef");
+    const receiptAmount = el("receiptAmount");
+
+    const itemsSection = el("itemsSection");
+    const itemDesc = el("itemDesc");
+    const itemQty = el("itemQty");
+    const itemUnit = el("itemUnit");
+    const addItemBtn = el("addItemBtn");
+    const clearItemsBtn = el("clearItemsBtn");
+    const itemsTbody = el("itemsTbody");
+    const advanced = el("advanced");
+    const currency = el("currency");
+
+    const newBtn = el("newBtn");
+    const saveBtn = el("saveBtn");
+    const downloadBtn = el("downloadBtn");
+    const deleteBtn = el("deleteBtn");
+    const resetDataBtn = el("resetDataBtn");
+
+    const previewContainer = el("previewContainer");
+    const pdfMount = el("pdfMount");
+    const historyList = el("historyList");
+    const modeLabel = el("modeLabel");
+    const countLabel = el("countLabel");
+    const previewType = el("previewType");
+
+    const quotationExtra = el("quotationExtra");
+    const commonRefRow = el("commonRefRow");
+
+    /***********************
+     * App State           *
+     ***********************/
+    let items = [];
+    let editingId = null;
+
+    function setMode(isEdit){
+      modeLabel.textContent = isEdit ? "Mode: Editing" : "Mode: New";
+      deleteBtn.disabled = !isEdit;
+    }
+
+    function newDocument(){
+      editingId = null;
+      setMode(false);
+
+      const type = docType.value;
+      docNumber.value = nextNumberForType(type);
+      docDate.value = todayISO();
+
+      // defaults
+      validUntil.value = "";
+      reference.value = "";
+      customerName.value = "";
+      customerPhone.value = "";
+
+      forInvoiceNumber.value = "";
+      receiptDateTimeText.value = "";
+      paymentMethod.value = "";
+      paymentRef.value = "";
+      receiptAmount.value = "";
+
+      advanced.value = "0";
+      currency.value = "LKR";
+
+      items = [];
+      renderItems();
+      handleTypeUI();
+      renderPreview();
+    }
+
+    function handleTypeUI(){
+      const type = docType.value;
+
+      // show valid until only for quotation
+      quotationExtra.style.display = (type === "QUOTATION") ? "grid" : "none";
+      commonRefRow.style.display = "grid";
+
+      // receipt uses receipt fields; items optional but we keep available
+      receiptFields.style.display = (type === "RECEIPT") ? "block" : "none";
+
+      // For receipt: advanced isn't meaningful; keep items optional
+      // Keep items section visible but hide advanced line in totals by logic later.
+      itemsSection.style.display = "block";
+      previewType.textContent = TYPE_LABEL[type];
+
+      // Ensure number reflects type if user changes type mid-edit
+      if (!editingId){
+        docNumber.value = nextNumberForType(type);
       }
     }
 
-    // Initialize on load
-    document.addEventListener('DOMContentLoaded', initializeForm);
-    
-    // Add initial render
-    setTimeout(renderItems, 100);
+    function addItem(){
+      const desc = (itemDesc.value || "").trim();
+      const qty = Number(itemQty.value || 0);
+      const unit = Number(itemUnit.value || 0);
+
+      if (!desc) { alert("Please enter item description."); return; }
+      if (qty <= 0) { alert("Quantity must be greater than 0."); return; }
+      if (unit < 0) { alert("Unit price cannot be negative."); return; }
+
+      items.push({ desc, qty, unit });
+      itemDesc.value = "";
+      itemQty.value = "";
+      itemUnit.value = "";
+      renderItems();
+      renderPreview();
+    }
+
+    function removeItem(idx){
+      items.splice(idx, 1);
+      renderItems();
+      renderPreview();
+    }
+
+    function clearItems(){
+      if (!confirm("Clear all line items?")) return;
+      items = [];
+      renderItems();
+      renderPreview();
+    }
+
+    function renderItems(){
+      itemsTbody.innerHTML = "";
+      items.forEach((it, idx) => {
+        const tr = document.createElement("tr");
+        const total = Number(it.qty) * Number(it.unit);
+        tr.innerHTML = `
+          <td>${escapeHtml(it.desc)}</td>
+          <td class="num">${money(it.qty)}</td>
+          <td class="num">${money(it.unit)}</td>
+          <td class="num">${money(total)}</td>
+          <td class="actions"><button class="miniBtn" type="button" title="Remove" data-idx="${idx}">×</button></td>
+        `;
+        itemsTbody.appendChild(tr);
+      });
+
+      itemsTbody.querySelectorAll("button[data-idx]").forEach(btn => {
+        btn.addEventListener("click", () => removeItem(Number(btn.dataset.idx)));
+      });
+    }
+
+    function getFormDoc(){
+      const type = docType.value;
+
+      const doc = {
+        id: editingId || crypto.randomUUID(),
+        type,
+        number: docNumber.value.trim(),
+        dateISO: docDate.value,
+        customerName: customerName.value.trim(),
+        customerPhone: customerPhone.value.trim(),
+        reference: reference.value.trim(),
+        validUntilISO: validUntil.value,
+        currency: currency.value,
+        items: items.map(x => ({...x})),
+        advanced: Number(advanced.value || 0),
+
+        // receipt fields
+        forInvoiceNumber: forInvoiceNumber.value.trim(),
+        receiptDateTimeText: receiptDateTimeText.value.trim(),
+        paymentMethod: paymentMethod.value.trim(),
+        paymentRef: paymentRef.value.trim(),
+        receiptAmount: Number(receiptAmount.value || 0),
+
+        createdAt: editingId ? undefined : Date.now(),
+        updatedAt: Date.now()
+      };
+
+      return doc;
+    }
+
+    function validateDoc(doc){
+      if (!doc.number) return "Document number is missing.";
+      if (!doc.dateISO) return "Date is required.";
+
+      if (!doc.customerName) return "Customer name is required.";
+      if (!doc.customerPhone) return "Customer phone is required.";
+
+      if (doc.type === "QUOTATION" && doc.validUntilISO && doc.validUntilISO < doc.dateISO){
+        return "Valid Until cannot be earlier than Date.";
+      }
+
+      if (doc.type !== "RECEIPT"){
+        if (doc.items.length === 0) return "Please add at least one line item.";
+      } else {
+        if (doc.receiptAmount <= 0) return "Receipt amount must be greater than 0.";
+        if (!doc.paymentMethod) return "Payment method is required for receipt.";
+      }
+
+      return null;
+    }
+
+    function saveCurrent(){
+      const docs = loadDocs();
+      const doc = getFormDoc();
+      const err = validateDoc(doc);
+      if (err) { alert(err); return; }
+
+      const existingIdx = docs.findIndex(d => d.id === doc.id);
+      if (existingIdx >= 0){
+        docs[existingIdx] = { ...docs[existingIdx], ...doc, updatedAt: Date.now() };
+      } else {
+        docs.unshift({ ...doc, createdAt: Date.now() });
+      }
+
+      saveDocs(docs);
+      editingId = doc.id;
+      setMode(true);
+      renderHistory();
+      renderPreview();
+      alert("Saved.");
+    }
+
+    function loadForEdit(id){
+      const docs = loadDocs();
+      const doc = docs.find(d => d.id === id);
+      if (!doc) return;
+
+      editingId = doc.id;
+      setMode(true);
+
+      docType.value = doc.type;
+      docNumber.value = doc.number;
+      docDate.value = doc.dateISO || todayISO();
+
+      validUntil.value = doc.validUntilISO || "";
+      reference.value = doc.reference || "";
+      customerName.value = doc.customerName || "";
+      customerPhone.value = doc.customerPhone || "";
+
+      currency.value = doc.currency || "LKR";
+      advanced.value = String(doc.advanced || 0);
+
+      forInvoiceNumber.value = doc.forInvoiceNumber || "";
+      receiptDateTimeText.value = doc.receiptDateTimeText || "";
+      paymentMethod.value = doc.paymentMethod || "";
+      paymentRef.value = doc.paymentRef || "";
+      receiptAmount.value = String(doc.receiptAmount || 0);
+
+      items = (doc.items || []).map(x => ({...x}));
+      renderItems();
+      handleTypeUI();
+      renderPreview();
+    }
+
+    function deleteCurrent(){
+      if (!editingId) return;
+      if (!confirm("Delete this document?")) return;
+
+      const docs = loadDocs().filter(d => d.id !== editingId);
+      saveDocs(docs);
+
+      editingId = null;
+      setMode(false);
+      renderHistory();
+      newDocument();
+    }
+
+    function resetAllData(){
+      if (!confirm("This will delete ALL saved documents and reset numbering. Continue?")) return;
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(COUNTER_KEY);
+      items = [];
+      editingId = null;
+      setMode(false);
+      renderHistory();
+      newDocument();
+    }
+
+    /***********************
+     * Template Rendering  *
+     ***********************/
+    function renderDocHTML(doc){
+      const typeTitle = TYPE_LABEL[doc.type];
+      const metaLabel1 = TYPE_META_LABEL_1[doc.type];
+      const dateText = formatDateDDMMYYYY(doc.dateISO);
+
+      // Items and totals
+      const subtotal = sumItems(doc.items || []);
+      const adv = Number(doc.advanced || 0);
+      const total = subtotal - adv;
+
+      const currencyLabel = doc.currency || "LKR";
+      const showTotals = doc.type !== "RECEIPT";
+
+      const col1 = (doc.type === "RECEIPT") ? "DESCRIPTION" : "BOOKING DETAILS";
+      const refText = (doc.type === "RECEIPT")
+        ? `For Invoice # ${doc.forInvoiceNumber || "[Optional]"}`
+        : (doc.reference || "[Optional]");
+
+      const validUntilRow = (doc.type === "QUOTATION" && doc.validUntilISO)
+        ? `<div class="metaRow"><div class="k">Valid Until</div><div class="v">${formatDateDDMMYYYY(doc.validUntilISO)}</div></div>`
+        : "";
+
+      const itemsRows = (doc.items || []).map(it => {
+        const t = Number(it.qty||0) * Number(it.unit||0);
+        return `
+          <tr>
+            <td>${escapeHtml(it.desc)}</td>
+            <td class="colQty">${money(it.qty)}</td>
+            <td class="colUnit">${money(it.unit)}</td>
+            <td class="colTotal">${money(t)}</td>
+          </tr>`;
+      }).join("");
+
+      const receiptBlock = (doc.type === "RECEIPT") ? `
+        <div class="receiptInfo">
+          <div class="rRow"><div class="rk">Received From</div><div class="rv">${escapeHtml(doc.customerName || "")}</div></div>
+          <div class="rRow"><div class="rk">Receipt Amount</div><div class="rv">${currencyLabel} ${money(doc.receiptAmount)}</div></div>
+          <div class="rRow"><div class="rk">Payment Method</div><div class="rv">${escapeHtml(doc.paymentMethod || "")}</div></div>
+          <div class="rRow"><div class="rk">Reference No</div><div class="rv">${escapeHtml(doc.paymentRef || "[Txn/Slip No]")}</div></div>
+          <div class="rRow"><div class="rk">For Invoice #</div><div class="rv">${escapeHtml(doc.forInvoiceNumber || "[Optional]")}</div></div>
+          <div class="rRow"><div class="rk">Date & Time</div><div class="rv">${escapeHtml(doc.receiptDateTimeText || dateText)}</div></div>
+        </div>` : "";
+
+      const totalsBlock = showTotals ? `
+        <div class="totalsWrap">
+          <div class="totals">
+            <div class="totalsTopLine"></div>
+
+            <div class="tRow">
+              <div class="label">Sub Total</div>
+              <div class="value">${currencyLabel} ${money(subtotal)}</div>
+            </div>
+
+            <div class="tRow">
+              <div class="label">Advanced</div>
+              <div class="value">${currencyLabel} ${money(adv)}</div>
+            </div>
+
+            <div class="goldLine"></div>
+
+            <div class="tTotal">
+              <div>Total</div>
+              <div>${currencyLabel} ${money(total)}</div>
+            </div>
+          </div>
+        </div>` : "";
+
+      const footer = (doc.type === "RECEIPT")
+        ? "Payment received with thanks."
+        : "Thank you for choosing Sunset Escape.";
+
+      return `
+        <div class="pageA4">
+          <div class="docHeader">
+            <div class="docBrand">
+              <img class="docLogo" src="${BRAND.logoSrc}" alt="Sunset Escape Logo" />
+              <div class="docBrandText">
+                <h1>${BRAND.name}</h1>
+                <div class="docTagline">${BRAND.tagline}</div>
+                <div class="docContact">
+                  ${BRAND.phone}<br />
+                  ${BRAND.locationLine}
+                </div>
+              </div>
+            </div>
+
+            <div class="docBox">
+              <div class="docTitle">${typeTitle}</div>
+              <div class="docMeta">
+                <div class="metaRow">
+                  <div class="k">${metaLabel1}</div>
+                  <div class="v">${escapeHtml(doc.number)}</div>
+                </div>
+                <div class="metaRow">
+                  <div class="k">Date</div>
+                  <div class="v">${dateText}</div>
+                </div>
+                ${validUntilRow}
+              </div>
+            </div>
+          </div>
+
+          <div class="dividerGold"></div>
+
+          <div class="guestLine">
+            <div><strong>Customer:</strong> ${escapeHtml(doc.customerName || "")}</div>
+            <div><strong>Phone:</strong> ${escapeHtml(doc.customerPhone || "")}</div>
+            <div><strong>Reference:</strong> ${escapeHtml(refText)}</div>
+          </div>
+
+          <table class="docTable">
+            <thead>
+              <tr>
+                <th>${col1}</th>
+                <th class="colQty">QUANTITY</th>
+                <th class="colUnit">UNIT PRICE</th>
+                <th class="colTotal">TOTAL</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itemsRows || `
+                <tr>
+                  <td>[No line items]</td><td class="colQty">0</td><td class="colUnit">0</td><td class="colTotal">0</td>
+                </tr>`
+              }
+            </tbody>
+          </table>
+
+          ${totalsBlock}
+          ${receiptBlock}
+
+          <div class="docFooter">${footer}</div>
+        </div>
+      `;
+    }
+
+    function renderPreview(){
+      const doc = getFormDoc();
+      // avoid blocking preview with validation errors; show whatever exists
+      previewContainer.innerHTML = renderDocHTML(doc);
+    }
+
+    async function downloadPDFForCurrent(){
+      const doc = getFormDoc();
+      const err = validateDoc(doc);
+      if (err) { alert(err); return; }
+
+      // render into pdf mount (not scaled)
+      pdfMount.innerHTML = renderDocHTML(doc);
+
+      const filename = `${doc.type}-${doc.number}.pdf`;
+      const opt = {
+        margin: 0,
+        filename,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+      };
+
+      try{
+        await html2pdf().set(opt).from(pdfMount.firstElementChild).save();
+      } finally {
+        pdfMount.innerHTML = "";
+      }
+    }
+
+    /***********************
+     * History Rendering   *
+     ***********************/
+    function renderHistory(){
+      const docs = loadDocs();
+      countLabel.textContent = `${docs.length} saved document(s)`;
+      historyList.innerHTML = "";
+
+      if (docs.length === 0){
+        historyList.innerHTML = `<div class="hint">No saved documents yet.</div>`;
+        return;
+      }
+
+      docs.slice(0, 50).forEach(d => {
+        const subtotal = sumItems(d.items || []);
+        const total = (d.type === "RECEIPT")
+          ? Number(d.receiptAmount || 0)
+          : (subtotal - Number(d.advanced || 0));
+
+        const card = document.createElement("div");
+        card.className = "histItem";
+
+        const title = `${TYPE_LABEL[d.type]} #${d.number}`;
+        const meta = `${formatDateDDMMYYYY(d.dateISO)} • ${d.customerName} • ${d.currency || "LKR"} ${money(total)}`;
+
+        card.innerHTML = `
+          <div>
+            <div class="hTitle">${escapeHtml(title)}</div>
+            <div class="hMeta">${escapeHtml(meta)}</div>
+          </div>
+          <div class="histBtns">
+            <button class="miniBtn" data-open="${d.id}">Open</button>
+            <button class="miniBtn" data-pdf="${d.id}">PDF</button>
+          </div>
+        `;
+        historyList.appendChild(card);
+      });
+
+      historyList.querySelectorAll("button[data-open]").forEach(b => {
+        b.addEventListener("click", () => loadForEdit(b.dataset.open));
+      });
+
+      historyList.querySelectorAll("button[data-pdf]").forEach(b => {
+        b.addEventListener("click", async () => {
+          const docs = loadDocs();
+          const d = docs.find(x => x.id === b.dataset.pdf);
+          if (!d) return;
+
+          // render & download
+          pdfMount.innerHTML = renderDocHTML(d);
+          const filename = `${d.type}-${d.number}.pdf`;
+          const opt = {
+            margin: 0,
+            filename,
+            image: { type: "jpeg", quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+          };
+          try{
+            await html2pdf().set(opt).from(pdfMount.firstElementChild).save();
+          } finally {
+            pdfMount.innerHTML = "";
+          }
+        });
+      });
+    }
+
+    /***********************
+     * Safety: HTML escape *
+     ***********************/
+    function escapeHtml(str){
+      return String(str || "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    /***********************
+     * Events              *
+     ***********************/
+    docType.addEventListener("change", () => { handleTypeUI(); renderPreview(); });
+    [docDate, validUntil, reference, customerName, customerPhone, advanced, currency,
+     forInvoiceNumber, receiptDateTimeText, paymentMethod, paymentRef, receiptAmount
+    ].forEach(x => x.addEventListener("input", renderPreview));
+
+    addItemBtn.addEventListener("click", addItem);
+    clearItemsBtn.addEventListener("click", clearItems);
+
+    newBtn.addEventListener("click", newDocument);
+    saveBtn.addEventListener("click", saveCurrent);
+    downloadBtn.addEventListener("click", downloadPDFForCurrent);
+    deleteBtn.addEventListener("click", deleteCurrent);
+    resetDataBtn.addEventListener("click", resetAllData);
+
+    /***********************
+     * Init                *
+     ***********************/
+    function init(){
+      docDate.value = todayISO();
+      handleTypeUI();
+      renderHistory();
+      // Initialize new doc with a number
+      newDocument();
+    }
+
+    init();
   </script>
 </body>
 </html>
